@@ -6,76 +6,172 @@
 <meta name="theme-color" content="#171923">
 <title>D&D Помощник</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>(function(){try{var p=localStorage.getItem('dnd.theme')||'auto',w=window.Telegram&&Telegram.WebApp;document.documentElement.dataset.eff=p==='auto'?((w&&w.colorScheme)||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')):p}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Source+Sans+3:wght@400;500;600;700&display=swap">
 <style>
-:root {
-  color-scheme: dark;
-  --bg:#11131b; --panel:#1c202c; --line:#343b4d;
-  --text:#f4f5f8; --muted:#aab2c2; --accent:#8c78ed;
-  --green:#39b887; --red:#e17c69;
+:root{
+  --serif:'Alegreya',Georgia,'Times New Roman',serif;
+  --sans:'Source Sans 3',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+  --bg:#ece3cf; --panel:#f8f2e3; --panel2:#f0e7d1; --field:#fffaf0;
+  --ink:#2b2218; --muted:#7a6a55; --line:#d6c8ac;
+  --accent:#8b2e25; --accent-ink:#fff8ee; --accent-soft:#ecd9c9;
+  --gold:#9a7424; --ok:#4d7a45; --mid:#b58a1c; --low:#b3392c;
+  --shadow:0 1px 2px rgba(70,45,10,.12);
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
-font:16px system-ui,sans-serif}
-.app{max-width:760px;margin:auto;padding:16px 13px 110px}
-.panel{background:var(--panel);border:1px solid var(--line);
-border-radius:14px;padding:13px;margin:10px 0}
-.top,.between{display:flex;justify-content:space-between;
-align-items:center;gap:10px}
-.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+:root[data-eff="dark"]{
+  color-scheme:dark;
+  --bg:#171310; --panel:#211c17; --panel2:#2a241d; --field:#1a1612;
+  --ink:#eee4d0; --muted:#a39580; --line:#3a3128;
+  --accent:#d4634d; --accent-ink:#1c120e; --accent-soft:#3a2722;
+  --gold:#d6aa55; --ok:#86b57a; --mid:#d8a73a; --low:#e0705f;
+  --shadow:0 1px 2px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--sans)}
+.app{max-width:720px;margin:auto;padding:14px 14px 120px}
+h1,h2,h3{font-family:var(--serif);margin:0;font-weight:700;letter-spacing:.01em}
+h1{font-size:32px;line-height:1.05}
+h3{font-size:21px;margin-bottom:10px}
+strong,b{font-weight:700}
 .muted{color:var(--muted)}
-.small{font-size:12px}
-h1{font-size:24px;margin:3px 0}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;color:inherit}
-.btn,.tab{border:1px solid var(--line);background:#252b39;
-border-radius:9px;padding:9px 11px;font-size:13px;font-weight:600}
-.primary,.tab.active{background:var(--accent);color:white}
-input,select,textarea{background:#141824;border:1px solid var(--line);
-border-radius:9px;padding:10px;color:var(--text);width:100%;min-width:0}
-textarea{resize:vertical;min-height:66px}
-.atk{border-top:1px solid var(--line);margin-top:10px;padding-top:8px;line-height:1.6}
-label{display:block;font-size:13px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
-.round{text-align:center;background:var(--panel);padding:8px 14px;
-border-radius:12px;border:1px solid var(--line)}
-.round strong{display:block;font-size:24px}
-.hpbar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin:6px 0}
-.hpfill{height:100%;background:var(--green)}
-.hpfill.enemy{background:var(--red)}
-.fighter.active,.panel.active{border:2px solid var(--accent);background:#24243a}
-.chip{display:inline-flex;align-items:center;gap:5px;
-border:1px solid var(--line);background:#141824;border-radius:20px;
-padding:5px 8px;margin:3px;font-size:11px}
-.chip button{border:0;background:none;color:var(--muted)}
-.status-form{display:grid;grid-template-columns:1.2fr .8fr;gap:7px;margin-top:8px}
-.check{display:flex;align-items:center;gap:8px;margin:12px 0 4px;color:var(--text)}
-.check input{width:auto}
-.wpicker{display:grid;grid-template-columns:1fr 78px auto;gap:7px;margin-top:9px}
+.small{font-size:13px}
+.eyebrow{font:700 11px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .hidden{display:none!important}
 .full{width:100%}
-.hint{font-size:12px;color:var(--muted);line-height:1.5}
-.empty{text-align:center;padding:25px;color:var(--muted)}
-details{border-bottom:1px solid var(--line);padding:9px 0}
+.hint{font-size:13px;color:var(--muted);line-height:1.5}
+.empty{text-align:center;padding:26px;color:var(--muted)}
+ 
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0;box-shadow:var(--shadow)}
+.top,.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.top{padding:4px 2px 2px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ 
+/* кнопки */
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:8px;
+ padding:9px 14px;font:600 14px var(--sans);min-height:40px;transition:transform .05s}
+.btn:active{transform:translateY(1px)}
+.btn.primary,.btn.primary:active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn.full{margin-top:8px}
+.link{border:0;background:none;color:var(--muted);font:600 13px var(--sans);padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+.linkrow{display:flex;gap:14px;justify-content:center;margin-top:2px}
+ 
+/* вкладки */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:12px 0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:0;background:none;color:var(--muted);padding:11px 13px;font:600 14px var(--sans);
+ border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+ 
+/* поля */
+input,select,textarea{background:var(--field);border:1px solid var(--line);border-radius:8px;
+ padding:10px 11px;color:var(--ink);width:100%;min-width:0;font:400 16px var(--sans);min-height:42px}
+textarea{resize:vertical;min-height:66px;line-height:1.4}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+::placeholder{color:var(--muted);opacity:.7}
+label{display:block;font:700 11px/1.3 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+label>input,label>select,label>textarea,label>div{margin-top:5px}
+label.check{display:flex;align-items:center;gap:9px;margin:12px 0 4px;color:var(--ink);
+ font:500 15px var(--sans);letter-spacing:0;text-transform:none}
+label.check input{margin:0}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:22px;height:22px;min-width:22px;min-height:22px;
+ padding:0;border:2px solid var(--muted);border-radius:50%;background:transparent;position:relative;flex:none}
+input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+input[type=checkbox]:checked::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:10px;
+ border:solid var(--accent-ink);border-width:0 2px 2px 0;transform:rotate(45deg)}
+ 
+/* раскрывающиеся секции */
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:0;box-shadow:var(--shadow)}
+.sec>summary{list-style:none;padding:14px;font:700 20px var(--serif);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary::after{content:'';width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+ transform:rotate(45deg);margin:-3px 4px 0 10px;transition:transform .15s;flex:none}
+.sec[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.sec>.body{padding:0 14px 14px}
+details{border-bottom:1px solid var(--line);padding:10px 0}
 summary{cursor:pointer;font-weight:600}
-input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-color:var(--accent)}
-.navbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#171923;border-top:1px solid var(--line);z-index:20}
-.navbtn{flex:1;border:1px solid var(--line);background:#252b39;border-radius:11px;padding:12px 8px;font-size:14px;font-weight:700}
-.navbtn.active{background:var(--accent);color:#fff}
-.toast{position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#252b39;border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-size:13px;max-width:90%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.sec{border-bottom:1px solid var(--line);padding:0}
+.tag{display:inline-block;font:700 10px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;
+ border-radius:4px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);vertical-align:middle;margin-left:6px}
+.tag.turn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+ 
+/* лист: шапка */
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:10px 0;box-shadow:var(--shadow)}
+.hero-name{font:700 28px/1.1 var(--serif)}
+.hero-sub{color:var(--muted);font-size:14px;margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 2px 7px;text-align:center}
+.stat .k{display:block;font:700 10px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat b{font:700 24px/1.2 var(--serif)}
+.hpwrap{margin-top:14px}
+.hptext{font:700 20px var(--serif)}
+.hpbar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:7px 0}
+.hpfill{height:100%;background:var(--ok);transition:width .25s}
+.hpfill.mid{background:var(--mid)}
+.hpfill.low{background:var(--low)}
+.hpbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.charbar{display:flex;gap:8px}
+.charbar select{flex:1}
+ 
+/* характеристики */
+.abgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.abbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 6px 9px;text-align:center}
+.abbox .k{font:700 10px var(--sans);letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.mod{font:700 32px/1.1 var(--serif);color:var(--ink);margin:2px 0}
+.calc{font:700 26px/1.2 var(--serif);color:var(--accent)}
+.abbox input{width:58px;margin:4px auto 0;text-align:center;border-radius:999px;padding:4px;min-height:32px;font:700 15px var(--sans)}
+ 
+/* навыки и спасброски */
+.line{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.line .v{min-width:42px;text-align:right;font:700 18px var(--serif)}
+.sk{position:relative;width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);background:transparent;padding:0;flex:none}
+.sk::after{content:'';position:absolute;inset:-10px}
+.sk[data-p="1"]{background:var(--accent);border-color:var(--accent)}
+.sk[data-p="2"]{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
+ 
+/* вложенные блоки */
+.atkrow{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:8px}
+.atk{border-top:1px solid var(--line);margin-top:8px;padding-top:8px;line-height:1.5}
+.atk b{font-family:var(--serif);font-size:16px}
+.wpicker{display:grid;grid-template-columns:1fr 78px auto;gap:8px;margin-top:10px}
+.wpicker2{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;margin-top:10px}
+.wpicker2 .check{margin:0;font-size:13px}
+ 
+/* бой */
+.turn{border-left:5px solid var(--accent)}
+.turnname{display:block;font:700 26px/1.15 var(--serif)}
+.fighter{border-left:5px solid var(--line)}
+.fighter.k-enemy{border-left-color:var(--low)}
+.fighter.k-player{border-left-color:var(--ok)}
+.fighter.k-ally{border-left-color:var(--gold)}
+.fighter.active,.panel.active{box-shadow:0 0 0 2px var(--accent);background:var(--accent-soft)}
+.fname{font:700 20px var(--serif)}
+.fighter .btn{padding:7px 12px;min-height:38px}
+.fighter input{min-height:38px;padding:7px 9px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--ink);
+ border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 11px;margin:3px 5px 3px 0;font-size:13px}
+.chip button{border:0;background:none;color:var(--muted);font-size:18px;line-height:1;padding:0 5px}
+.status-form{display:grid;grid-template-columns:1.2fr .8fr;gap:8px;margin-top:8px}
+ 
+/* нижняя навигация */
+.navbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--panel);border-top:1px solid var(--line);
+ padding:0 8px env(safe-area-inset-bottom);z-index:20}
+.navbtn{flex:1;border:0;border-top:3px solid transparent;background:none;color:var(--muted);padding:8px 4px 8px;
+ font:700 11px var(--sans);letter-spacing:.05em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px}
+.navbtn svg{width:25px;height:25px}
+.navbtn.active{color:var(--accent);border-top-color:var(--accent)}
+.navbtn.small{flex:0 0 62px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);
+ background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 16px;font-size:14px;max-width:90%;
+ text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .toast.show{opacity:1}
-.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}
-.sec>summary{font-size:15px}
-.abgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.abbox{text-align:center;background:#141824;border:1px solid var(--line);border-radius:12px;padding:8px}
-.abbox input{text-align:center;font-size:17px;font-weight:700;padding:6px;margin-top:4px}
-.mod{font-size:22px;font-weight:800;color:var(--accent)}
-.line{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
-.line .v{min-width:38px;text-align:right;font-weight:800}
-.sk{background:none;border:1px solid var(--line);border-radius:50%;width:28px;height:28px;font-size:14px;padding:0;flex:none}
-.atkrow{background:#141824;border:1px solid var(--line);border-radius:11px;padding:8px;margin-bottom:7px}
-.wpicker2{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-top:9px}
-.wpicker2 .check{margin:0;font-size:12px}
 </style>
 </head>
 <body>
@@ -83,57 +179,49 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
  
 <div id="combatApp" class="hidden">
 <header class="top">
- <div>
-  <div class="small muted">ADVENTURE TOOLKIT</div>
-  <h1>⚔️ D&D Combat Tracker</h1>
-  <div class="small muted">Трекер боя и состояний</div>
- </div>
- <div class="round">
-  <span class="small muted">РАУНД</span>
-  <strong id="round">1</strong>
- </div>
+ <div><div class="eyebrow">Трекер боя</div><h1>Раунд <span id="round">1</span></h1></div>
 </header>
  
-<section class="panel between">
+<section class="panel turn between">
  <div>
-  <div class="small muted">ТЕКУЩИЙ ХОД</div>
-  <strong id="current">Бой не начат</strong>
+  <div class="eyebrow">Ходит</div>
+  <strong id="current" class="turnname">Бой не начат</strong>
   <div id="next" class="small muted">Добавь участников</div>
  </div>
- <button class="btn primary" id="nextTurn">Следующий →</button>
+ <button class="btn primary" id="nextTurn">Далее →</button>
 </section>
  
 <nav class="tabs">
- <button class="tab active" data-tab="battle">⚔️ Бой</button>
- <button class="tab" data-tab="add">＋ Участник</button>
- <button class="tab" data-tab="initiative">🎲 Инициатива</button>
- <button class="tab" data-tab="library">📚 Справочник</button>
+ <button class="tab active" data-tab="battle">Участники</button>
+ <button class="tab" data-tab="add">Добавить</button>
+ <button class="tab" data-tab="initiative">Очередь</button>
+ <button class="tab" data-tab="library">Шаблоны</button>
 </nav>
  
 <section id="battle">
  <div class="between">
-  <strong>Участники боя</strong>
+  <span class="eyebrow">Участники боя</span>
   <span id="count" class="small muted">0 участников</span>
  </div>
  <div id="fighters">
   <div class="panel empty">Добавь персонажа или врага.</div>
  </div>
- <button class="btn full" id="quickAdd">＋ Добавить участника</button>
- <button class="btn full" id="reset">↻ Сбросить бой</button>
+ <button class="btn primary full" id="quickAdd">+ Добавить участника</button>
+ <button class="btn ghost full" id="reset"> Сбросить бой</button>
 </section>
  
 <section id="add" class="panel hidden">
  <h3>Новый участник</h3>
- <label>Из справочника
+ <label>Из шаблонов
   <select id="fromLib"><option value="">— вручную —</option></select>
  </label>
  <label style="margin-top:9px">Имя<input id="name" placeholder="Например, Гоблин"></label>
  <div class="grid" style="margin-top:9px">
   <label>Тип
    <select id="kind">
-    <option value="enemy">👹 Враг</option>
-    <option value="player">🛡️ Игрок</option>
-    <option value="ally">✨ Союзник</option>
+    <option value="enemy">Враг</option>
+    <option value="player">Игрок</option>
+    <option value="ally">Союзник</option>
    </select>
   </label>
   <label>Количество<input id="ecount" type="number" min="1" max="20" value="1"></label>
@@ -147,31 +235,31 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
  <div class="wpicker">
   <select id="wpickA"></select>
   <input id="wbonusA" type="number" placeholder="Бонус" title="Бонус атаки">
-  <button class="btn" id="wbtnA" type="button">＋ Атака</button>
+  <button class="btn" id="wbtnA" type="button">+ Атака</button>
  </div>
  <label style="margin-top:9px">Возможные атаки (по одной на строку)
   <textarea id="attacks" placeholder="Скимитар: +4, 1d6+2 рубящий&#10;Короткий лук: +4, 1d6+2 колющий, 80/320 фт."></textarea>
  </label>
- <button class="btn full" id="rollInit" type="button" style="margin-top:9px">🎲 Бросить d20 + бонус</button>
- <label class="check"><input type="checkbox" id="saveLib"> Сохранить в справочник</label>
+ <button class="btn full" id="rollInit" type="button" style="margin-top:9px">Бросить d20 + бонус</button>
+ <label class="check"><input type="checkbox" id="saveLib"> Сохранить как шаблон</label>
  <button class="btn primary full" id="addBtn" style="margin-top:8px">Добавить в бой</button>
 </section>
  
 <section id="initiativeTab" class="panel hidden">
- <h3>🎲 Очередь инициативы</h3>
+ <h3>Очередь инициативы</h3>
  <div id="order"></div>
 </section>
  
 <section id="libraryTab" class="hidden">
  <div class="panel">
-  <h3>Добавить в справочник</h3>
+  <h3>Новый шаблон</h3>
   <label>Имя<input id="lname" placeholder="Например, Гоблин"></label>
   <div class="grid" style="margin-top:9px">
    <label>Тип
     <select id="lkind">
-     <option value="enemy">👹 Враг</option>
-     <option value="player">🛡️ Игрок</option>
-     <option value="ally">✨ Союзник</option>
+     <option value="enemy">Враг</option>
+     <option value="player">Игрок</option>
+     <option value="ally">Союзник</option>
     </select>
    </label>
    <label>Максимум HP<input id="lmax" type="number" min="1" value="10"></label>
@@ -182,18 +270,18 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
   <div class="wpicker">
   <select id="wpickL"></select>
   <input id="wbonusL" type="number" placeholder="Бонус" title="Бонус атаки">
-  <button class="btn" id="wbtnL" type="button">＋ Атака</button>
+  <button class="btn" id="wbtnL" type="button">+ Атака</button>
  </div>
  <label style="margin-top:9px">Возможные атаки (по одной на строку)
    <textarea id="lattacks" placeholder="Скимитар: +4, 1d6+2 рубящий&#10;Короткий лук: +4, 1d6+2 колющий, 80/320 фт."></textarea>
   </label>
-  <button class="btn primary full" id="libAdd" style="margin-top:10px">Сохранить в справочник</button>
+  <button class="btn primary full" id="libAdd" style="margin-top:10px">Сохранить шаблон</button>
  </div>
  <div id="libList"></div>
 </section>
  
 <section class="panel">
- <strong>📖 Памятка по состояниям</strong>
+ <strong>Памятка по состояниям</strong>
  <div id="glossary"></div>
 </section>
  
@@ -201,31 +289,45 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
  
 <div id="sheetApp">
  <div class="tabs" style="margin-top:0">
-  <button class="tab active" data-sub="sheet">📋 Лист</button>
-  <button class="tab" data-sub="refs">📚 Справочники</button>
+  <button class="tab active" data-sub="sheet">Лист</button>
+  <button class="tab" data-sub="refs">Справочники</button>
  </div>
  
  <div id="subSheet">
-  <div class="panel">
-   <div class="between"><strong>🧙 Лист персонажа</strong><span class="small muted">D&D 5e · 2014</span></div>
-   <div class="row" style="margin-top:9px;flex-wrap:nowrap">
-    <select id="charSel" style="flex:1;width:auto"></select>
-    <button class="btn" id="charNew" title="Новый">＋</button>
-    <button class="btn" id="charCopy" title="Дублировать">⎘</button>
-    <button class="btn" id="charDel" title="Удалить">🗑</button>
-   </div>
-   <button class="btn primary full" id="toCombat" style="margin-top:9px">⚔️ Отправить в бой</button>
+ <div class="charbar">
+  <select id="charSel"></select>
+  <button class="btn" id="charNew">+ Новый</button>
+ </div>
+ <div class="hero">
+  <div class="hero-name" id="heroName"></div>
+  <div class="hero-sub" id="heroSub"></div>
+  <div class="stats">
+   <div class="stat"><span class="k">КД</span><b id="stAc">10</b></div>
+   <div class="stat"><span class="k">Иниц.</span><b id="stInit">+0</b></div>
+   <div class="stat"><span class="k">Скорость</span><b id="stSpd">30</b></div>
+   <div class="stat"><span class="k">Мастер.</span><b id="stPb">+2</b></div>
   </div>
-  <div id="sheetBody"></div>
+  <div class="hpwrap">
+   <div class="between"><span class="eyebrow">Здоровье</span><span><b id="hpText" class="hptext"></b> <span id="hpTemp" class="small muted"></span></span></div>
+   <div class="hpbar"><div class="hpfill" id="hpFill"></div></div>
+   <div class="hpbtns">
+    <button class="btn" data-hp="-5">−5</button><button class="btn" data-hp="-1">−1</button>
+    <button class="btn" data-hp="1">+1</button><button class="btn" data-hp="5">+5</button>
+   </div>
+  </div>
+  <button class="btn primary full" id="toCombat">Отправить в бой</button>
+ </div>
+ <div class="linkrow"><button class="link" id="charCopy">Дублировать персонажа</button><button class="link" id="charDel">Удалить</button></div>
+ <div id="sheetBody"></div>
  </div>
  
  <div id="subRefs" class="hidden">
   <div class="tabs" style="margin-top:0">
-   <button class="tab active" data-ref="races">🧬 Расы</button>
-   <button class="tab" data-ref="classes">⚙️ Классы</button>
-   <button class="tab" data-ref="spells">🔮 Заклинания</button>
-   <button class="tab" data-ref="weapons">🗡️ Оружие</button>
-   <button class="tab" data-ref="armor">🛡️ Доспехи</button>
+   <button class="tab active" data-ref="races">Расы</button>
+   <button class="tab" data-ref="classes">Классы</button>
+   <button class="tab" data-ref="spells">Заклинания</button>
+   <button class="tab" data-ref="weapons">Оружие</button>
+   <button class="tab" data-ref="armor">Доспехи</button>
   </div>
   <div id="refRaces" class="refview"></div>
   <div id="refClasses" class="refview hidden"></div>
@@ -239,7 +341,7 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
   </div>
   <div id="refWeapons" class="refview hidden">
  <div class="panel">
-  <h3>🗡️ Справочник оружия</h3>
+  <h3>Справочник оружия</h3>
   <div class="hint">Книга игрока, 5-я редакция (2014). Цены: зм — золотые, см — серебряные, мм — медные монеты. Вес в фунтах.</div>
   <div class="grid" style="margin-top:10px">
    <input id="wsearch" placeholder="Поиск по названию…">
@@ -254,7 +356,7 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
  </div>
  <div id="wlist"></div>
  <div class="panel">
-  <strong>📜 Свойства оружия</strong>
+  <strong>Свойства оружия</strong>
   <div id="wprops"></div>
  </div>
 </div>
@@ -264,8 +366,9 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
 </div>
  
 <nav class="navbar">
- <button class="navbtn active" data-mode="sheet">🧙 Персонаж</button>
- <button class="navbtn" data-mode="combat">⚔️ Бой</button>
+ <button class="navbtn active" data-mode="sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c.8-4.2 3.8-6.2 7.5-6.2s6.7 2 7.5 6.2"/></svg><span>Персонаж</span></button>
+ <button class="navbtn" data-mode="combat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l9 9M13 13l-2.5 2.5M8.5 16l-3.5 3.5M20 4l-9 9M11 13l2.5 2.5M15.5 16l3.5 3.5"/></svg><span>Бой</span></button>
+ <button class="navbtn small" id="themeBtn" aria-label="Сменить тему"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg><span>Тема</span></button>
 </nav>
 <div id="message" class="toast"></div>
  
@@ -276,7 +379,7 @@ input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-colo
 const tg=window.Telegram&&Telegram.WebApp;
 if(tg){try{
  tg.ready();tg.expand();
- tg.setHeaderColor('#11131b');tg.setBackgroundColor('#11131b');
+ 
  if(tg.disableVerticalSwipes)tg.disableVerticalSwipes();
 }catch(e){}}
 const cloud=tg&&tg.CloudStorage&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.9')?tg.CloudStorage:null;
@@ -341,6 +444,26 @@ document.addEventListener('click',e=>{
  if(tg&&tg.HapticFeedback&&e.target.closest('button'))
   try{tg.HapticFeedback.selectionChanged()}catch(err){}
 });
+ 
+const root=document.documentElement,TL={auto:'авто',light:'светлая',dark:'тёмная'};
+const pref=()=>{try{return localStorage.getItem('dnd.theme')||'auto'}catch(e){return 'auto'}};
+function applyTheme(p,say){
+ root.dataset.eff=p==='auto'?((tg&&tg.colorScheme)||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')):p;
+ try{localStorage.setItem('dnd.theme',p)}catch(e){}
+ if(tg)try{
+  const cs=getComputedStyle(root);
+  tg.setHeaderColor(cs.getPropertyValue('--bg').trim());
+  tg.setBackgroundColor(cs.getPropertyValue('--bg').trim());
+  if(tg.setBottomBarColor)tg.setBottomBarColor(cs.getPropertyValue('--panel').trim());
+ }catch(e){}
+ if(say)window.toast('Тема: '+TL[p]);
+}
+applyTheme(pref(),false);
+document.getElementById('themeBtn').onclick=()=>{
+ const m=['auto','light','dark'];
+ applyTheme(m[(m.indexOf(pref())+1)%3],true);
+};
+if(tg&&tg.onEvent)tg.onEvent('themeChanged',()=>{if(pref()==='auto')applyTheme('auto',false)});
 })();
 </script>
 <script>
@@ -348,18 +471,18 @@ document.addEventListener('click',e=>{
 const $=id=>document.getElementById(id);
  
 const defs=[
-['Отравлен','🧪','Помеха к броскам атаки и проверкам характеристик.'],
-['Оглушён','😵','Недееспособен, не может двигаться и говорить. Автоматически проваливает спасброски Силы и Ловкости. Атаки по нему имеют преимущество.'],
-['Испуган','😨','Помеха проверкам характеристик и атакам, пока источник страха находится в пределах видимости.'],
-['Опутан','🕸️','Скорость 0, помеха атакам. Атаки по нему имеют преимущество.'],
-['Ослеплён','👁️','Не видит. Атаки по нему имеют преимущество, его атаки — помеху.'],
-['Недееспособен','💤','Не может совершать действия и реакции.'],
-['Невидимость','👻','Не виден без особого способа обнаружения.'],
-['Скорость 0','🐌','Скорость передвижения становится равной 0.'],
-['Концентрация','🛡️','Поддерживает заклинание, требующее концентрации.'],
-['Благословение','✨','Заклинание добавляет 1d4 к атакам и спасброскам.'],
-['Горение','🔥','Особый эффект огня. Урон задаёт ведущий.'],
-['Замедление','❄️','Особый эффект замедления. Правила зависят от источника.']
+['Отравлен','','Помеха к броскам атаки и проверкам характеристик.'],
+['Оглушён','','Недееспособен, не может двигаться и говорить. Автоматически проваливает спасброски Силы и Ловкости. Атаки по нему имеют преимущество.'],
+['Испуган','','Помеха проверкам характеристик и атакам, пока источник страха находится в пределах видимости.'],
+['Опутан','','Скорость 0, помеха атакам. Атаки по нему имеют преимущество.'],
+['Ослеплён','','Не видит. Атаки по нему имеют преимущество, его атаки — помеху.'],
+['Недееспособен','','Не может совершать действия и реакции.'],
+['Невидимость','','Не виден без особого способа обнаружения.'],
+['Скорость 0','','Скорость передвижения становится равной 0.'],
+['Концентрация','','Поддерживает заклинание, требующее концентрации.'],
+['Благословение','','Заклинание добавляет 1d4 к атакам и спасброскам.'],
+['Горение','','Особый эффект огня. Урон задаёт ведущий.'],
+['Замедление','','Особый эффект замедления. Правила зависят от источника.']
 ];
  
 let people=[],round=1,turn=0,nextId=1,library=[],libId=1,quiet=false;
@@ -405,7 +528,7 @@ function combatInfo(p){
  const lines=atkLines(p.attacks);
  if(!p.weapon&&!lines.length)return '';
  return `<div class="atk small">
-  <b>⚔️ ОРУЖИЕ И АТАКИ</b>
+  <b>ОРУЖИЕ И АТАКИ</b>
   ${p.weapon?'<div><span class="muted">Оружие:</span> '+esc(p.weapon)+'</div>':''}
   ${lines.map(l=>'<div>• '+esc(l)+'</div>').join('')}
  </div>`;
@@ -422,25 +545,25 @@ function render(){
  
  $('fighters').innerHTML=list.length?list.map((p,i)=>{
   const pct=Math.max(0,Math.min(100,p.hp/p.max*100));
-  const ico=p.kind==='enemy'?'👹':p.kind==='player'?'🛡️':'✨';
+  const kl={enemy:'Враг',player:'Игрок',ally:'Союзник'}[p.kind]||'';
  
   return `
-  <article class="panel fighter ${i===idx?'active':''}">
+  <article class="panel fighter k-${p.kind} ${i===idx?'active':''}">
    <div class="between">
     <div>
-     <strong>${ico} ${esc(p.name)}</strong>
-     ${i===idx?'<span class="small">● ХОД</span>':''}
+     <strong class="fname">${esc(p.name)}</strong> <span class="tag">${kl}</span>
+     ${i===idx?'<span class="tag turn">Ход</span>':''}
      <div class="small muted">Инициатива: ${p.init}${p.ac!=null?' · КД '+p.ac:''}</div>
     </div>
-    <button class="btn remove" data-id="${p.id}">✕</button>
+    <button class="btn remove" data-id="${p.id}">×</button>
    </div>
  
    <div class="between small" style="margin-top:10px">
-    <span class="muted">❤️ Здоровье</span>
+    <span class="muted">Здоровье</span>
     <b>${p.hp} / ${p.max} HP</b>
    </div>
    <div class="hpbar">
-    <div class="hpfill ${p.kind==='enemy'?'enemy':''}"
+    <div class="hpfill ${pct<=25?'low':pct<=50?'mid':''}"
      style="width:${pct}%"></div>
    </div>
  
@@ -456,15 +579,15 @@ function render(){
  
    ${combatInfo(p)}
    <div style="margin-top:12px">
-    <div class="small"><b>✨ СОСТОЯНИЯ (${p.status.length})</b></div>
+    <div class="eyebrow">Состояния (${p.status.length})</div>
     <div>
      ${p.status.length?p.status.map((s,j)=>{
       const d=defs.find(x=>x[0]===s.name);
       return `<span class="chip">
-       ${d?d[1]:'✨'} ${esc(s.name)}
+       ${esc(s.name)}
        ${s.remaining!==null?' · '+s.remaining+' р.':''}
        <button class="removeStatus" data-id="${p.id}"
-        data-j="${j}">✕</button>
+        data-j="${j}">×</button>
       </span>`;
      }).join(''):'<span class="small muted">Нет активных состояний</span>'}
     </div>
@@ -478,7 +601,7 @@ function render(){
       min="1" placeholder="Раунды">
     </div>
     <button class="btn addStatus full" data-id="${p.id}"
-     style="margin-top:7px">＋ Добавить состояние</button>
+     style="margin-top:7px">+ Добавить состояние</button>
    </div>
   </article>`;
  }).join(''):'<div class="panel empty">Пока никого нет.</div>';
@@ -488,7 +611,7 @@ function render(){
    <span>${i+1}. ${esc(p.name)}
     <div class="small muted">${p.hp}/${p.max} HP · ${p.status.length} состояний</div>
    </span>
-   <b>🎲 ${p.init}</b>
+   <b>${p.init}</b>
   </div>`).join('')||'<p class="muted">Список пуст.</p>';
  
  renderLib();
@@ -607,7 +730,7 @@ $('fighters').onclick=e=>{
  render();
 };
  
-const kindIco=k=>k==='enemy'?'👹':k==='player'?'🛡️':'✨';
+const kindIco=k=>k==='enemy'?'':k==='player'?'':'';
 const kindName={player:'Герои',ally:'Союзники',enemy:'Враги'};
 const groups=['player','ally','enemy'];
  
@@ -635,11 +758,11 @@ function renderLib(){
      ${atkLines(x.attacks).map(l=>'<div class="small">• '+esc(l)+'</div>').join('')}
     </div>
     <div class="row">
-     <button class="btn primary" data-act="use" data-id="${x.id}">⚔️ В бой</button>
-     <button class="btn" data-act="del" data-id="${x.id}">✕</button>
+     <button class="btn primary" data-act="use" data-id="${x.id}">В бой</button>
+     <button class="btn" data-act="del" data-id="${x.id}">×</button>
     </div>
    </div>`).join('');
- }).join(''):'<div class="panel empty">Справочник пуст. Добавь героев и врагов выше.</div>';
+ }).join(''):'<div class="panel empty">Шаблонов пока нет. Создай первый выше.</div>';
 }
  
 function rollInit(){
@@ -676,11 +799,11 @@ $('libAdd').onclick=()=>{
  const kind=$('lkind').value;
  if(!name||!Number.isFinite(max)||max<1){say('Проверь введённые данные.');return}
  if(library.some(x=>x.kind===kind&&x.name.toLowerCase()===name.toLowerCase())){
-  say('Такая запись уже есть в справочнике.');return;
+  say('Такой шаблон уже есть.');return;
  }
  library.push({id:libId++,name,kind,max,bonus,ac,weapon,attacks});
  $('lname').value='';$('lac').value=10;$('lweapon').value='';$('lattacks').value='';
- render();say('«'+name+'» добавлен в справочник.');
+ render();say('«'+name+'» сохранён в шаблоны.');
 };
  
 $('libList').onclick=e=>{
@@ -693,7 +816,7 @@ $('libList').onclick=e=>{
  }
  if(b.dataset.act==='del'){
   library=library.filter(x=>x.id!==id);
-  render();say('Удалено из справочника.');
+  render();say('Шаблон удалён.');
  }
 };
  
@@ -815,7 +938,7 @@ window.addToCombat=o=>{
  
 $('glossary').innerHTML=defs.map(d=>`
  <details>
-  <summary>${d[1]} ${d[0]}</summary>
+  <summary>${d[0]}</summary>
   <div class="hint" style="margin-top:7px">${d[2]}</div>
  </details>`).join('');
  
@@ -1151,8 +1274,8 @@ function S(c){
 const inp=(l,k,a='')=>`<label>${l}<input data-k="${k}" ${a}></label>`;
 const num=(l,k,a='')=>inp(l,k,'type="number" '+a);
 const area=(l,k,r=3)=>`<label style="margin-top:8px">${l}<textarea data-k="${k}" style="min-height:${r*22}px"></textarea></label>`;
-const sec=(t,b,o=true)=>`<details class="sec" ${o?'open':''}><summary>${t}</summary><div style="margin-top:10px">${b}</div></details>`;
-const calcBox=(l,id)=>`<label>${l}<div class="mod" data-c="${id}" style="padding:6px 0"></div></label>`;
+const sec=(t,b,o=true)=>`<details class="sec" ${o?'open':''}><summary><span>${t}</span></summary><div class="body">${b}</div></details>`;
+const calcBox=(l,id)=>`<label>${l}<div class="calc" data-c="${id}"></div></label>`;
  
 function raceOptions(){
  const groups={};
@@ -1164,89 +1287,107 @@ function raceOptions(){
  
 function sheetHTML(){
  const lv=Array.from({length:9},(_,i)=>i+1);
+ const hdr=t=>`<div class="eyebrow" style="margin:16px 0 4px">${t}</div>`;
  return [
- sec('📋 Основное',`
+ sec('Основное',`
   ${inp('Имя персонажа','name')}
-  <div class="grid" style="margin-top:8px">
+  <div class="grid" style="margin-top:10px">
    <label>Класс<select data-k="cls"><option value="">— выбери —</option>${Object.keys(CLASSES).map(n=>`<option>${n}</option>`).join('')}</select></label>
    ${num('Уровень','level','min="1" max="20"')}
    <label>Раса<select data-k="race">${raceOptions()}</select></label>
    ${inp('Подкласс','sub','placeholder="Архетип, традиция…"')}
    ${inp('Предыстория','bg')}${inp('Мировоззрение','align')}
    ${inp('Игрок','player')}${num('Опыт (XP)','xp','min="0"')}
-   ${calcBox('Бонус мастерства','pb')}
   </div>
-  <label class="check"><input type="checkbox" data-k="insp"> ✨ Вдохновение</label>`),
+  <label class="check"><input type="checkbox" data-k="insp"> Вдохновение</label>`,true),
  
- sec('🧬 Особенности расы <span class="small muted">(авто)</span>','<div id="raceBox"></div>',false),
- sec('⚙️ Умения класса по уровню <span class="small muted">(авто)</span>','<div id="classBox"></div>',true),
- 
- sec('💪 Характеристики',`<div class="abgrid">${AB.map(([k,ab,n])=>`
-  <div class="abbox"><div class="small muted">${n}</div>
+ sec('Характеристики',`<div class="abgrid">${AB.map(([k,ab,n])=>`
+  <div class="abbox"><div class="k">${n}</div>
    <div class="mod" data-c="mod.${k}"></div>
-   <input data-k="abil.${k}" type="number" min="1" max="30"></div>`).join('')}</div>
-  <div class="hint" style="margin-top:6px">Расовые бонусы прибавляются к характеристикам автоматически при выборе расы.</div>`),
+   <input data-k="abil.${k}" type="number" min="1" max="30" aria-label="${n}"></div>`).join('')}</div>
+  <div class="hint" style="margin-top:10px">Расовые бонусы прибавляются к значениям автоматически при выборе расы.</div>`,true),
  
- sec('🛡️ Спасброски и навыки',`
-  <div class="small muted"><b>СПАСБРОСКИ</b> (класс отмечает владение автоматически)</div>
-  ${AB.map(([k,ab,n])=>`<div class="line"><input type="checkbox" data-k="saveProf.${k}"><span style="flex:1">${n}</span><span class="v" data-c="save.${k}"></span></div>`).join('')}
-  <div class="small muted" style="margin-top:14px"><b>НАВЫКИ</b> (○ нет · ● владение · ◆ компетентность · ★ можно выбрать от класса)</div>
-  ${SK.map(([k,n,a])=>`<div class="line"><button class="sk" data-skill="${k}">○</button><span style="flex:1">${n} <span class="small muted">(${abShort[a]})</span> <span data-sm="${k}" style="color:#e8b84a"></span></span><span class="v" data-c="skill.${k}"></span></div>`).join('')}
-  <div class="line"><span style="flex:1">👁️ Пассивная внимательность</span><span class="v" data-c="passive"></span></div>`),
+ sec('Атаки',`
+  <div id="atkList"></div>
+  <div class="wpicker2">
+   <select id="sheetWpick"></select>
+   <label class="check"><input type="checkbox" id="wProf" checked> Владею</label>
+   <button class="btn" id="wAdd">+ Добавить</button>
+  </div>
+  <button class="btn ghost full" id="atkAdd">Своя атака вручную</button>
+  <div class="hint" style="margin-top:8px">Бонус атаки и урон считаются сами: Сила для рукопашного оружия, Ловкость для дальнобойного, лучшая из двух для фехтовального.</div>`,true),
  
- sec('❤️ Бой',`
+ sec('Умения класса <span class="tag">авто</span>','<div id="classBox"></div>',true),
+ 
+ sec('Спасброски и навыки',`
+  ${hdr('Спасброски')}
+  ${AB.map(([k,ab,n])=>`<div class="line"><input type="checkbox" data-k="saveProf.${k}" aria-label="Владение"><span style="flex:1">${n}</span><span class="v" data-c="save.${k}"></span></div>`).join('')}
+  ${hdr('Навыки')}
+  <div class="hint">Нажми на кружок: пусто — нет владения, залит — владение, с обводкой — компетентность. <b style="color:var(--gold)">★</b> — навык, который класс даёт на выбор.</div>
+  ${SK.map(([k,n,a])=>`<div class="line"><button class="sk" data-skill="${k}" data-p="0" aria-label="Владение навыком"></button><span style="flex:1">${n} <span class="small muted">${abShort[a]}</span> <b data-sm="${k}" style="color:var(--gold)"></b></span><span class="v" data-c="skill.${k}"></span></div>`).join('')}
+  <div class="line"><span style="flex:1"><b>Пассивная внимательность</b></span><span class="v" data-c="passive"></span></div>`,false),
+ 
+ sec('Бой и защита',`
   <div class="grid">
    ${num('Класс доспеха (КД)','ac','min="0"')}${num('Скорость (фт.)','speed','min="0"')}
    ${num('Бонус к инициативе','initBonus')}${calcBox('Инициатива','init')}
    ${num('Максимум HP','hpMax','min="0"')}${num('Текущие HP','hp','min="0"')}
    ${num('Временные HP','hpTemp','min="0"')}${inp('Кости хитов','hitDice','placeholder="3d8"')}
   </div>
-  <div class="row" style="margin-top:9px">${[-5,-1,1,5].map(n=>`<button class="btn" data-hp="${n}">${n>0?'+':''}${n} HP</button>`).join('')}
-   <button class="btn" id="hpCalc">🧮 HP по среднему</button></div>
-  <div class="wpicker2" style="margin-top:10px">
+  <button class="btn ghost full" id="hpCalc">Рассчитать максимум HP по среднему</button>
+  ${hdr('Доспех')}
+  <div class="wpicker2">
    <select data-k="armor"><option value="">Без доспехов</option>${ARMOR.map(a=>`<option>${a[0]}</option>`).join('')}</select>
    <label class="check" style="margin:0"><input type="checkbox" data-k="shield"> Щит</label>
-   <button class="btn" id="acCalc">🧮 КД</button>
+   <button class="btn" id="acCalc">Расчёт КД</button>
   </div>
-  <div class="small muted" style="margin-top:12px"><b>СПАСБРОСКИ ОТ СМЕРТИ</b></div>
-  <div class="row" style="margin-top:6px">Успехи ${[0,1,2].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}
-   &nbsp;&nbsp;Провалы ${[3,4,5].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}</div>
-  <button class="btn full" id="longRest" style="margin-top:10px">🌙 Долгий отдых</button>`),
+  ${hdr('Спасброски от смерти')}
+  <div class="row" style="gap:12px">Успехи ${[0,1,2].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}
+   <span style="width:10px"></span>Провалы ${[3,4,5].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}</div>
+  <button class="btn ghost full" id="longRest" style="margin-top:14px">Долгий отдых</button>`,false),
  
- sec('⚔️ Атаки',`
-  <div id="atkList"></div>
-  <button class="btn full" id="atkAdd" style="margin-top:4px">＋ Добавить атаку вручную</button>
-  <div class="wpicker2">
-   <select id="sheetWpick"></select>
-   <label class="check"><input type="checkbox" id="wProf" checked> Владею</label>
-   <button class="btn" id="wAdd">＋</button>
-  </div>
-  <div class="hint" style="margin-top:6px">Бонус атаки и урон считаются сами: Сила для рукопашного, Ловкость для дальнобойного, лучшая из двух для фехтовального оружия.</div>`),
+ sec('Особенности расы <span class="tag">авто</span>','<div id="raceBox"></div>',false),
  
- sec('🎒 Снаряжение и деньги',`
-  <div class="grid" style="grid-template-columns:repeat(5,1fr)">${[['cp','ММ'],['sp','СМ'],['ep','ЭМ'],['gp','ЗМ'],['pp','ПМ']].map(([k,l])=>`<label>${l}<input data-k="${k}" type="number" min="0" style="padding:8px 4px;text-align:center"></label>`).join('')}</div>
-  ${area('Снаряжение','equip',5)}`),
- 
- sec('🎭 Личность',area('Черты характера','traits')+area('Идеалы','ideals')+area('Привязанности','bonds')+area('Слабости','flaws'),false),
- 
- sec('📜 Свои заметки и владения',area('Дополнительные умения','features',4)+area('Владения и языки (свои записи)','profs',4)+area('Заметки','notes',4),false),
- 
- sec('🔮 Заклинания',`
+ sec('Заклинания',`
   <div class="grid" style="grid-template-columns:repeat(3,1fr)">
    <label>Характеристика<select data-k="spellAbil">${AB.filter(a=>['int','wis','cha'].includes(a[0])).map(a=>`<option value="${a[0]}">${a[2]}</option>`).join('')}</select></label>
    ${calcBox('Сл спасброска','dc')}${calcBox('Бонус атаки','sattack')}
   </div>
-  <div class="small muted" style="margin-top:12px"><b>ЯЧЕЙКИ</b> (всего / потрачено; пересчитываются при смене класса или уровня)</div>
-  <div class="abgrid" style="margin-top:6px">${lv.map(i=>`
-   <div class="abbox"><div class="small muted">${i} ур.</div>
-    <div class="row" style="flex-wrap:nowrap;gap:3px;margin-top:4px">
-     <input data-k="slots.${i}.t" type="number" min="0" style="padding:6px 2px;text-align:center;margin:0">
+  ${hdr('Ячейки: всего / потрачено')}
+  <div class="abgrid">${lv.map(i=>`
+   <div class="abbox"><div class="k">${i} уровень</div>
+    <div class="row" style="flex-wrap:nowrap;gap:3px;margin-top:6px;justify-content:center">
+     <input data-k="slots.${i}.t" type="number" min="0" style="width:46px;padding:4px;text-align:center;margin:0;min-height:36px" aria-label="Всего">
      <span>/</span>
-     <input data-k="slots.${i}.u" type="number" min="0" style="padding:6px 2px;text-align:center;margin:0">
+     <input data-k="slots.${i}.u" type="number" min="0" style="width:46px;padding:4px;text-align:center;margin:0;min-height:36px" aria-label="Потрачено">
     </div></div>`).join('')}</div>
-  <div class="hint" style="margin-top:6px">Заклинания добавляй из «Справочники → Заклинания» кнопкой «＋ В лист».</div>
-  ${[0,...lv].map(i=>area(i===0?'Заговоры':i+' уровень','spells.'+i,3)).join('')}`,false)
+  <div class="hint" style="margin-top:8px">Ячейки пересчитываются при смене класса или уровня. Заклинания добавляй из «Справочники → Заклинания» кнопкой «В лист».</div>
+  ${[0,...lv].map(i=>area(i===0?'Заговоры':i+' уровень','spells.'+i,3)).join('')}`,false),
+ 
+ sec('Снаряжение и деньги',`
+  <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:6px">${[['cp','ММ'],['sp','СМ'],['ep','ЭМ'],['gp','ЗМ'],['pp','ПМ']].map(([k,l])=>`<label style="text-align:center">${l}<input data-k="${k}" type="number" min="0" style="padding:8px 2px;text-align:center"></label>`).join('')}</div>
+  ${area('Снаряжение','equip',5)}`,false),
+ 
+ sec('Личность',area('Черты характера','traits')+area('Идеалы','ideals')+area('Привязанности','bonds')+area('Слабости','flaws'),false),
+ 
+ sec('Заметки',area('Дополнительные умения','features',4)+area('Владения и языки (свои записи)','profs',4)+area('Заметки','notes',4),false)
  ].join('');
+}
+ 
+function updateHero(){
+ const c=cur();if(!c)return;
+ const {pb,mod}=S(c);
+ $('heroName').textContent=c.name||'Без имени';
+ $('heroSub').textContent=(c.race||'Раса не выбрана')+' · '+(c.cls?c.cls+' '+lvlOf(c)+' ур.':'класс не выбран');
+ $('stAc').textContent=Number(c.ac)||0;
+ $('stInit').textContent=sg(mod('dex')+(Number(c.initBonus)||0));
+ $('stSpd').textContent=Number(c.speed)||0;
+ $('stPb').textContent=sg(pb);
+ const hp=Number(c.hp)||0,max=Number(c.hpMax)||0,pct=Math.max(0,Math.min(100,hp/Math.max(1,max)*100));
+ $('hpText').textContent=hp+' / '+max;
+ $('hpTemp').textContent=Number(c.hpTemp)>0?'+'+c.hpTemp+' врем.':'';
+ $('hpFill').className='hpfill '+(pct<=25?'low':pct<=50?'mid':'');
+ $('hpFill').style.width=pct+'%';
 }
  
 /* ---------- авто-блоки расы и класса ---------- */
@@ -1291,7 +1432,7 @@ function calc(){
   const p=(c.skillProf&&c.skillProf[k])||0;
   set('skill.'+k,sg(mod(a)+p*pb));
   const b=document.querySelector('.sk[data-skill="'+k+'"]');
-  if(b)b.textContent=['○','●','◆'][p];
+  if(b)b.dataset.p=p;
   const m=document.querySelector('[data-sm="'+k+'"]');
   if(m)m.textContent=cl&&cl.skills!=='any'&&cl.skills.includes(n)?'★':'';
  });
@@ -1300,6 +1441,7 @@ function calc(){
  const sa=c.spellAbil||'int';
  set('dc',8+pb+mod(sa));
  set('sattack',sg(pb+mod(sa)));
+ updateHero();
 }
  
 function fill(){
@@ -1354,7 +1496,7 @@ function renderAtk(){
    <div class="row" style="flex-wrap:nowrap">
     <input data-ai="${i}" data-af="name" placeholder="Название" value="${esc(a.name)}">
     <input data-ai="${i}" data-af="bonus" placeholder="Бонус" value="${esc(a.bonus)}" style="width:72px;flex:none">
-    <button class="btn" data-adel="${i}">✕</button>
+    <button class="btn" data-adel="${i}">×</button>
    </div>
    <div class="row" style="flex-wrap:nowrap;margin-top:6px">
     <input data-ai="${i}" data-af="dmg" placeholder="Урон" value="${esc(a.dmg)}">
@@ -1410,7 +1552,7 @@ function onClick(e){
   const max=Number(c.hpMax)||0;
   c.hp=Math.max(0,Math.min(max,(Number(c.hp)||0)+Number(b.dataset.hp)));
   document.querySelector('[data-k="hp"]').value=c.hp;
-  persist();
+  updateHero();persist();
  }
  if(b.dataset.adel!==undefined){
   c.attacks.splice(Number(b.dataset.adel),1);
@@ -1439,7 +1581,7 @@ function calcHP(){
  let hp=cl.hd+mod('con')+(lvl-1)*(cl.hd/2+1+mod('con'));
  if(c.race==='Дварф (холмовой)')hp+=lvl;
  c.hpMax=Math.max(1,Math.round(hp));c.hp=c.hpMax;
- fill();persist();
+ fill();calc();persist();
  toast('Максимум HP по среднему: '+c.hpMax+'.');
 }
  
@@ -1454,7 +1596,7 @@ function calcAC(){
   if(c.cls==='Монах')ac+=mod('wis');
  }
  if(c.shield)ac+=2;
- c.ac=ac;fill();persist();
+ c.ac=ac;fill();calc();persist();
  toast('КД: '+ac+(a?' ('+a[0]+(c.shield?' + щит':'')+')':' (без доспехов)'));
 }
  
@@ -1477,28 +1619,26 @@ function addWeapon(){
  
 /* ---------- справочники ---------- */
 function renderRaces(){
- const groups={};
- Object.keys(RACES).forEach(n=>{(groups[RACES[n].g]=groups[RACES[n].g]||[]).push(n)});
- $('refRaces').innerHTML=Object.entries(groups).map(([g,list])=>list.map(n=>{
+ $('refRaces').innerHTML=Object.keys(RACES).map(n=>{
   const r=RACES[n];
-  return `<details class="sec"><summary>${n}</summary>
-   <div class="small muted" style="margin-top:8px">${r.size} · скорость ${r.speed} фт. · бонусы: ${bonusText(r.bonus)}</div>
-   ${r.tr.map(t=>`<div class="atk small"><b>${t[0]}.</b> ${t[1]}</div>`).join('')}</details>`;
- }).join('')).join('');
+  return `<details class="sec"><summary><span>${n}</span></summary><div class="body">
+   <div class="small muted">${r.size} · скорость ${r.speed} фт. · бонусы: ${bonusText(r.bonus)}</div>
+   ${r.tr.map(t=>`<div class="atk small"><b>${t[0]}.</b> ${t[1]}</div>`).join('')}</div></details>`;
+ }).join('');
 }
  
 function renderClasses(){
  $('refClasses').innerHTML=Object.entries(CLASSES).map(([n,cl])=>{
   const sk=cl.skills==='any'?'любые '+cl.pick:'выбери '+cl.pick+' из: '+cl.skills.join(', ');
-  return `<details class="sec"><summary>${n} <span class="small muted">d${cl.hd}</span></summary>
-   <div class="small" style="margin-top:8px"><b>Спасброски:</b> ${cl.saves.map(k=>abName[k]).join(', ')}</div>
+  return `<details class="sec"><summary><span>${n} <span class="tag">d${cl.hd}</span></span></summary><div class="body">
+   <div class="small"><b>Спасброски:</b> ${cl.saves.map(k=>abName[k]).join(', ')}</div>
    <div class="small"><b>Доспехи:</b> ${cl.armor}</div>
    <div class="small"><b>Оружие:</b> ${cl.weapons}</div>
    <div class="small"><b>Инструменты:</b> ${cl.tools}</div>
    <div class="small"><b>Навыки:</b> ${sk}</div>
    ${cl.spell?`<div class="small"><b>Заклинания:</b> ${abName[cl.spell]}${cl.cast==='half'?' (со 2 уровня)':cl.cast==='pact'?' (Магия договора)':''}</div>`:''}
-   <div class="small muted" style="margin-top:10px"><b>УМЕНИЯ ПО УРОВНЯМ</b></div>
-   ${cl.feats.map(f=>`<div class="atk small"><b>Ур. ${f[0]} · ${f[1]}.</b> ${f[2]}</div>`).join('')}</details>`;
+   <div class="eyebrow" style="margin-top:14px">Умения по уровням</div>
+   ${cl.feats.map(f=>`<div class="atk small"><b>Ур. ${f[0]} · ${f[1]}.</b> ${f[2]}</div>`).join('')}</div></details>`;
  }).join('');
 }
  
@@ -1525,7 +1665,7 @@ function renderSpells(){
    <div class="small muted" style="margin-top:4px">${s[4]} · ${s[5]} · ${s[6]} · ${s[7]}</div>
    <div class="small" style="margin-top:5px">${s[9]}</div>
    <div class="between" style="margin-top:7px"><span class="small muted">${s[8]}</span>
-    <button class="btn" data-addsp="${i}">＋ В лист</button></div>
+    <button class="btn" data-addsp="${i}">+ В лист</button></div>
   </div>`).join('')||'<div class="panel empty">Ничего не найдено.</div>';
 }
  
@@ -1576,7 +1716,7 @@ function init(){
  renderSpells();
  
  ['input','change'].forEach(ev=>$('sheetBody').addEventListener(ev,onField));
- $('sheetBody').addEventListener('click',onClick);
+ $('subSheet').addEventListener('click',onClick);
  $('splist').addEventListener('click',e=>{
   const b=e.target.closest('button[data-addsp]');
   if(b)addSpell(Number(b.dataset.addsp));
@@ -1626,3 +1766,4 @@ init();
 </script>
 </body>
 </html>
+ 
