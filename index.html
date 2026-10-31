@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171923">
+<title>D&D Помощник</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#11131b; --panel:#1c202c; --line:#343b4d;
+  --text:#f4f5f8; --muted:#aab2c2; --accent:#8c78ed;
+  --green:#39b887; --red:#e17c69;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:16px system-ui,sans-serif}
+.app{max-width:760px;margin:auto;padding:16px 13px 110px}
+.panel{background:var(--panel);border:1px solid var(--line);
+border-radius:14px;padding:13px;margin:10px 0}
+.top,.between{display:flex;justify-content:space-between;
+align-items:center;gap:10px}
+.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+h1{font-size:24px;margin:3px 0}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+.btn,.tab{border:1px solid var(--line);background:#252b39;
+border-radius:9px;padding:9px 11px;font-size:13px;font-weight:600}
+.primary,.tab.active{background:var(--accent);color:white}
+input,select,textarea{background:#141824;border:1px solid var(--line);
+border-radius:9px;padding:10px;color:var(--text);width:100%;min-width:0}
+textarea{resize:vertical;min-height:66px}
+.atk{border-top:1px solid var(--line);margin-top:10px;padding-top:8px;line-height:1.6}
+label{display:block;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
+.round{text-align:center;background:var(--panel);padding:8px 14px;
+border-radius:12px;border:1px solid var(--line)}
+.round strong{display:block;font-size:24px}
+.hpbar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin:6px 0}
+.hpfill{height:100%;background:var(--green)}
+.hpfill.enemy{background:var(--red)}
+.fighter.active,.panel.active{border:2px solid var(--accent);background:#24243a}
+.chip{display:inline-flex;align-items:center;gap:5px;
+border:1px solid var(--line);background:#141824;border-radius:20px;
+padding:5px 8px;margin:3px;font-size:11px}
+.chip button{border:0;background:none;color:var(--muted)}
+.status-form{display:grid;grid-template-columns:1.2fr .8fr;gap:7px;margin-top:8px}
+.check{display:flex;align-items:center;gap:8px;margin:12px 0 4px;color:var(--text)}
+.check input{width:auto}
+.wpicker{display:grid;grid-template-columns:1fr 78px auto;gap:7px;margin-top:9px}
+.hidden{display:none!important}
+.full{width:100%}
+.hint{font-size:12px;color:var(--muted);line-height:1.5}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+details{border-bottom:1px solid var(--line);padding:9px 0}
+summary{cursor:pointer;font-weight:600}
+input[type=checkbox]{width:20px;height:20px;min-width:20px;padding:0;accent-color:var(--accent)}
+.navbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#171923;border-top:1px solid var(--line);z-index:20}
+.navbtn{flex:1;border:1px solid var(--line);background:#252b39;border-radius:11px;padding:12px 8px;font-size:14px;font-weight:700}
+.navbtn.active{background:var(--accent);color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#252b39;border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-size:13px;max-width:90%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.toast.show{opacity:1}
+.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}
+.sec>summary{font-size:15px}
+.abgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.abbox{text-align:center;background:#141824;border:1px solid var(--line);border-radius:12px;padding:8px}
+.abbox input{text-align:center;font-size:17px;font-weight:700;padding:6px;margin-top:4px}
+.mod{font-size:22px;font-weight:800;color:var(--accent)}
+.line{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.line .v{min-width:38px;text-align:right;font-weight:800}
+.sk{background:none;border:1px solid var(--line);border-radius:50%;width:28px;height:28px;font-size:14px;padding:0;flex:none}
+.atkrow{background:#141824;border:1px solid var(--line);border-radius:11px;padding:8px;margin-bottom:7px}
+.wpicker2{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-top:9px}
+.wpicker2 .check{margin:0;font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div id="combatApp">
+<header class="top">
+ <div>
+  <div class="small muted">ADVENTURE TOOLKIT</div>
+  <h1>⚔️ D&D Combat Tracker</h1>
+  <div class="small muted">Трекер боя и состояний</div>
+ </div>
+ <div class="round">
+  <span class="small muted">РАУНД</span>
+  <strong id="round">1</strong>
+ </div>
+</header>
+
+<section class="panel between">
+ <div>
+  <div class="small muted">ТЕКУЩИЙ ХОД</div>
+  <strong id="current">Бой не начат</strong>
+  <div id="next" class="small muted">Добавь участников</div>
+ </div>
+ <button class="btn primary" id="nextTurn">Следующий →</button>
+</section>
+
+<nav class="tabs">
+ <button class="tab active" data-tab="battle">⚔️ Бой</button>
+ <button class="tab" data-tab="add">＋ Участник</button>
+ <button class="tab" data-tab="initiative">🎲 Инициатива</button>
+ <button class="tab" data-tab="library">📚 Справочник</button>
+ <button class="tab" data-tab="weapons">🗡️ Оружие</button>
+</nav>
+
+<section id="battle">
+ <div class="between">
+  <strong>Участники боя</strong>
+  <span id="count" class="small muted">0 участников</span>
+ </div>
+ <div id="fighters">
+  <div class="panel empty">Добавь персонажа или врага.</div>
+ </div>
+ <button class="btn full" id="quickAdd">＋ Добавить участника</button>
+ <button class="btn full" id="reset">↻ Сбросить бой</button>
+</section>
+
+<section id="add" class="panel hidden">
+ <h3>Новый участник</h3>
+ <label>Из справочника
+  <select id="fromLib"><option value="">— вручную —</option></select>
+ </label>
+ <label style="margin-top:9px">Имя<input id="name" placeholder="Например, Гоблин"></label>
+ <div class="grid" style="margin-top:9px">
+  <label>Тип
+   <select id="kind">
+    <option value="enemy">👹 Враг</option>
+    <option value="player">🛡️ Игрок</option>
+    <option value="ally">✨ Союзник</option>
+   </select>
+  </label>
+  <label>Количество<input id="ecount" type="number" min="1" max="20" value="1"></label>
+  <label>Максимум HP<input id="maxhp" type="number" min="1" value="20"></label>
+  <label>Текущие HP<input id="hp" type="number" min="0" value="20"></label>
+  <label>Бонус инициативы<input id="initBonus" type="number" value="0"></label>
+  <label>Инициатива<input id="initiative" type="number" value="10"></label>
+  <label>Класс доспеха (КД)<input id="ac" type="number" min="0" value="10"></label>
+  <label>Оружие<input id="weapon" placeholder="Например, Скимитар"></label>
+ </div>
+ <div class="wpicker">
+  <select id="wpickA"></select>
+  <input id="wbonusA" type="number" placeholder="Бонус" title="Бонус атаки">
+  <button class="btn" id="wbtnA" type="button">＋ Атака</button>
+ </div>
+ <label style="margin-top:9px">Возможные атаки (по одной на строку)
+  <textarea id="attacks" placeholder="Скимитар: +4, 1d6+2 рубящий&#10;Короткий лук: +4, 1d6+2 колющий, 80/320 фт."></textarea>
+ </label>
+ <button class="btn full" id="rollInit" type="button" style="margin-top:9px">🎲 Бросить d20 + бонус</button>
+ <label class="check"><input type="checkbox" id="saveLib"> Сохранить в справочник</label>
+ <button class="btn primary full" id="addBtn" style="margin-top:8px">Добавить в бой</button>
+</section>
+
+<section id="initiativeTab" class="panel hidden">
+ <h3>🎲 Очередь инициативы</h3>
+ <div id="order"></div>
+</section>
+
+<section id="libraryTab" class="hidden">
+ <div class="panel">
+  <h3>Добавить в справочник</h3>
+  <label>Имя<input id="lname" placeholder="Например, Гоблин"></label>
+  <div class="grid" style="margin-top:9px">
+   <label>Тип
+    <select id="lkind">
+     <option value="enemy">👹 Враг</option>
+     <option value="player">🛡️ Игрок</option>
+     <option value="ally">✨ Союзник</option>
+    </select>
+   </label>
+   <label>Максимум HP<input id="lmax" type="number" min="1" value="10"></label>
+   <label>Бонус инициативы<input id="lbonus" type="number" value="0"></label>
+   <label>Класс доспеха (КД)<input id="lac" type="number" min="0" value="10"></label>
+   <label>Оружие<input id="lweapon" placeholder="Например, Скимитар"></label>
+  </div>
+  <div class="wpicker">
+  <select id="wpickL"></select>
+  <input id="wbonusL" type="number" placeholder="Бонус" title="Бонус атаки">
+  <button class="btn" id="wbtnL" type="button">＋ Атака</button>
+ </div>
+ <label style="margin-top:9px">Возможные атаки (по одной на строку)
+   <textarea id="lattacks" placeholder="Скимитар: +4, 1d6+2 рубящий&#10;Короткий лук: +4, 1d6+2 колющий, 80/320 фт."></textarea>
+  </label>
+  <button class="btn primary full" id="libAdd" style="margin-top:10px">Сохранить в справочник</button>
+ </div>
+ <div id="libList"></div>
+</section>
+
+<section id="weaponsTab" class="hidden">
+ <div class="panel">
+  <h3>🗡️ Справочник оружия</h3>
+  <div class="hint">Книга игрока, 5-я редакция (2014). Цены: зм — золотые, см — серебряные, мм — медные монеты. Вес в фунтах.</div>
+  <div class="grid" style="margin-top:10px">
+   <input id="wsearch" placeholder="Поиск по названию…">
+   <select id="wfilter">
+    <option value="">Все виды</option>
+    <option value="0">Простое рукопашное</option>
+    <option value="1">Простое дальнобойное</option>
+    <option value="2">Воинское рукопашное</option>
+    <option value="3">Воинское дальнобойное</option>
+   </select>
+  </div>
+ </div>
+ <div id="wlist"></div>
+ <div class="panel">
+  <strong>📜 Свойства оружия</strong>
+  <div id="wprops"></div>
+ </div>
+</section>
+
+<section class="panel">
+ <strong>📖 Памятка по состояниям</strong>
+ <div id="glossary"></div>
+</section>
+
+</div><!-- /combatApp -->
+
+<div id="sheetApp" class="hidden">
+ <div class="panel">
+  <div class="between"><strong>🧙 Лист персонажа</strong><span class="small muted">D&D 5e · 2014</span></div>
+  <div class="row" style="margin-top:9px;flex-wrap:nowrap">
+   <select id="charSel" style="flex:1;width:auto"></select>
+   <button class="btn" id="charNew" title="Новый">＋</button>
+   <button class="btn" id="charCopy" title="Дублировать">⎘</button>
+   <button class="btn" id="charDel" title="Удалить">🗑</button>
+  </div>
+  <button class="btn primary full" id="toCombat" style="margin-top:9px">⚔️ Отправить в бой</button>
+ </div>
+ <div id="sheetBody"></div>
+</div>
+
+<nav class="navbar">
+ <button class="navbtn active" data-mode="combat">⚔️ Бой</button>
+ <button class="navbtn" data-mode="sheet">🧙 Персонаж</button>
+</nav>
+<div id="message" class="toast"></div>
+
+</div>
+
+<script>
+(()=>{
+const tg=window.Telegram&&Telegram.WebApp;
+if(tg){try{
+ tg.ready();tg.expand();
+ tg.setHeaderColor('#11131b');tg.setBackgroundColor('#11131b');
+ if(tg.disableVerticalSwipes)tg.disableVerticalSwipes();
+}catch(e){}}
+const cloud=tg&&tg.CloudStorage&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.9')?tg.CloudStorage:null;
+const CH=1500,timers={},pending={};
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem('dnd.'+k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem('dnd.'+k,JSON.stringify(v))}catch(e){}};
+
+function push(key){
+ const wrap=pending[key];if(!wrap||!cloud)return;
+ delete pending[key];
+ const chars=Array.from(JSON.stringify(wrap));
+ const parts=[];
+ for(let i=0;i<chars.length;i+=CH)parts.push(chars.slice(i,i+CH).join(''));
+ let left=parts.length;
+ parts.forEach((p,i)=>cloud.setItem('dnd_'+key+'_'+i,p,()=>{
+  if(--left===0)cloud.setItem('dnd_'+key+'_n',String(parts.length),()=>{});
+ }));
+}
+function pull(key,cb){
+ cloud.getItem('dnd_'+key+'_n',(e,n)=>{
+  n=parseInt(n,10);
+  if(e||!n)return cb(null);
+  const keys=Array.from({length:n},(_,i)=>'dnd_'+key+'_'+i);
+  cloud.getItems(keys,(e2,vals)=>{
+   if(e2||!vals)return cb(null);
+   try{cb(JSON.parse(keys.map(k=>vals[k]||'').join('')))}catch(err){cb(null)}
+  });
+ });
+}
+
+window.Store={
+ cloud:!!cloud,
+ save(key,data){
+  const wrap={t:Date.now(),d:data};
+  lsSet(key,wrap);
+  if(!cloud)return;
+  pending[key]=wrap;
+  clearTimeout(timers[key]);
+  timers[key]=setTimeout(()=>push(key),1000);
+ },
+ load(key,cb){
+  const l=lsGet(key);
+  if(l&&l.d)cb(l.d);
+  if(!cloud)return;
+  pull(key,w=>{
+   if(w&&w.d&&(!l||w.t>l.t)){lsSet(key,w);cb(w.d)}
+  });
+ }
+};
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden)Object.keys(pending).forEach(push);
+});
+
+let tt;
+window.toast=s=>{
+ const e=document.getElementById('message');
+ e.textContent=s;e.classList.add('show');
+ clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2500);
+};
+
+document.addEventListener('click',e=>{
+ if(tg&&tg.HapticFeedback&&e.target.closest('button'))
+  try{tg.HapticFeedback.selectionChanged()}catch(err){}
+});
+})();
+</script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+
+const defs=[
+['Отравлен','🧪','Помеха к броскам атаки и проверкам характеристик.'],
+['Оглушён','😵','Недееспособен, не может двигаться и говорить. Автоматически проваливает спасброски Силы и Ловкости. Атаки по нему имеют преимущество.'],
+['Испуган','😨','Помеха проверкам характеристик и атакам, пока источник страха находится в пределах видимости.'],
+['Опутан','🕸️','Скорость 0, помеха атакам. Атаки по нему имеют преимущество.'],
+['Ослеплён','👁️','Не видит. Атаки по нему имеют преимущество, его атаки — помеху.'],
+['Недееспособен','💤','Не может совершать действия и реакции.'],
+['Невидимость','👻','Не виден без особого способа обнаружения.'],
+['Скорость 0','🐌','Скорость передвижения становится равной 0.'],
+['Концентрация','🛡️','Поддерживает заклинание, требующее концентрации.'],
+['Благословение','✨','Заклинание добавляет 1d4 к атакам и спасброскам.'],
+['Горение','🔥','Особый эффект огня. Урон задаёт ведущий.'],
+['Замедление','❄️','Особый эффект замедления. Правила зависят от источника.']
+];
+
+let people=[],round=1,turn=0,nextId=1,library=[],libId=1,quiet=false;
+
+const sorted=()=>[...people].sort((a,b)=>b.init-a.init||a.id-b.id);
+const active=()=>sorted()[turn%Math.max(1,people.length)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({
+ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+
+function say(s){window.toast(s)}
+
+function save(){
+ if(quiet)return;
+ Store.save('combat',{people,round,turn,nextId,library,libId});
+}
+
+function apply(x){
+ if(x&&Array.isArray(x.people)){
+  people=x.people;round=x.round||1;turn=x.turn||0;nextId=x.nextId||1;
+  library=Array.isArray(x.library)?x.library:[];libId=x.libId||1;
+ }
+}
+
+function load(){
+ Store.load('combat',x=>{quiet=true;apply(x);render();quiet=false;});
+}
+
+function tab(t){
+ document.querySelectorAll('[data-tab]').forEach(b=>
+  b.classList.toggle('active',b.dataset.tab===t));
+ const ids={battle:'battle',add:'add',initiative:'initiativeTab',library:'libraryTab',weapons:'weaponsTab'};
+ Object.entries(ids).forEach(([k,id])=>
+  $(id).classList.toggle('hidden',k!==t));
+}
+
+document.querySelectorAll('[data-tab]').forEach(b=>
+ b.onclick=()=>tab(b.dataset.tab));
+
+const atkLines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean);
+
+function combatInfo(p){
+ const lines=atkLines(p.attacks);
+ if(!p.weapon&&!lines.length)return '';
+ return `<div class="atk small">
+  <b>⚔️ ОРУЖИЕ И АТАКИ</b>
+  ${p.weapon?'<div><span class="muted">Оружие:</span> '+esc(p.weapon)+'</div>':''}
+  ${lines.map(l=>'<div>• '+esc(l)+'</div>').join('')}
+ </div>`;
+}
+
+function render(){
+ const list=sorted(),a=active(),idx=list.length?turn%list.length:0;
+
+ $('round').textContent=round;
+ $('current').textContent=a?a.name:'Бой не начат';
+ $('next').textContent=list.length?
+  'Следующий: '+list[(idx+1)%list.length].name:'Добавь участников';
+ $('count').textContent=people.length+' участников';
+
+ $('fighters').innerHTML=list.length?list.map((p,i)=>{
+  const pct=Math.max(0,Math.min(100,p.hp/p.max*100));
+  const ico=p.kind==='enemy'?'👹':p.kind==='player'?'🛡️':'✨';
+
+  return `
+  <article class="panel fighter ${i===idx?'active':''}">
+   <div class="between">
+    <div>
+     <strong>${ico} ${esc(p.name)}</strong>
+     ${i===idx?'<span class="small">● ХОД</span>':''}
+     <div class="small muted">Инициатива: ${p.init}${p.ac!=null?' · КД '+p.ac:''}</div>
+    </div>
+    <button class="btn remove" data-id="${p.id}">✕</button>
+   </div>
+
+   <div class="between small" style="margin-top:10px">
+    <span class="muted">❤️ Здоровье</span>
+    <b>${p.hp} / ${p.max} HP</b>
+   </div>
+   <div class="hpbar">
+    <div class="hpfill ${p.kind==='enemy'?'enemy':''}"
+     style="width:${pct}%"></div>
+   </div>
+
+   <div class="row" style="margin-top:9px">
+    ${[-5,-1,1,5].map(n=>`
+     <button class="btn hp" data-id="${p.id}" data-n="${n}">
+      ${n>0?'+':''}${n}
+     </button>`).join('')}
+    <input class="damage" data-id="${p.id}" type="number"
+     min="0" placeholder="Урон" style="width:75px">
+    <button class="btn hit" data-id="${p.id}">Нанести</button>
+   </div>
+
+   ${combatInfo(p)}
+   <div style="margin-top:12px">
+    <div class="small"><b>✨ СОСТОЯНИЯ (${p.status.length})</b></div>
+    <div>
+     ${p.status.length?p.status.map((s,j)=>{
+      const d=defs.find(x=>x[0]===s.name);
+      return `<span class="chip">
+       ${d?d[1]:'✨'} ${esc(s.name)}
+       ${s.remaining!==null?' · '+s.remaining+' р.':''}
+       <button class="removeStatus" data-id="${p.id}"
+        data-j="${j}">✕</button>
+      </span>`;
+     }).join(''):'<span class="small muted">Нет активных состояний</span>'}
+    </div>
+
+    <div class="status-form">
+     <select class="statusChoice" data-id="${p.id}">
+      <option value="">Выбрать состояние...</option>
+      ${defs.map(d=>`<option>${d[0]}</option>`).join('')}
+     </select>
+     <input class="duration" data-id="${p.id}" type="number"
+      min="1" placeholder="Раунды">
+    </div>
+    <button class="btn addStatus full" data-id="${p.id}"
+     style="margin-top:7px">＋ Добавить состояние</button>
+   </div>
+  </article>`;
+ }).join(''):'<div class="panel empty">Пока никого нет.</div>';
+
+ $('order').innerHTML=list.map((p,i)=>`
+  <div class="panel between ${i===idx?'active':''}">
+   <span>${i+1}. ${esc(p.name)}
+    <div class="small muted">${p.hp}/${p.max} HP · ${p.status.length} состояний</div>
+   </span>
+   <b>🎲 ${p.init}</b>
+  </div>`).join('')||'<p class="muted">Список пуст.</p>';
+
+ renderLib();
+ save();
+}
+
+$('addBtn').onclick=()=>{
+ const name=$('name').value.trim();
+ const max=Number($('maxhp').value);
+ const hp=Number($('hp').value);
+ const init=Number($('initiative').value);
+ const bonus=Number($('initBonus').value)||0;
+ const ac=$('ac').value.trim()===''?null:Math.max(0,Number($('ac').value)||0);
+ const weapon=$('weapon').value.trim();
+ const attacks=$('attacks').value.trim();
+ const kind=$('kind').value;
+ const count=Math.max(1,Math.min(20,Math.floor(Number($('ecount').value))||1));
+
+ if(!name||!Number.isFinite(max)||max<1||
+ !Number.isFinite(hp)||hp<0||!Number.isFinite(init)){
+  say('Проверь введённые данные.');return;
+ }
+
+ if($('saveLib').checked&&!library.some(x=>
+  x.kind===kind&&x.name.toLowerCase()===name.toLowerCase())){
+  library.push({id:libId++,name,kind,max,bonus,ac,weapon,attacks});
+ }
+
+ for(let i=1;i<=count;i++){
+  people.push({
+   id:nextId++,name:count>1?name+' '+i:name,kind,
+   max,hp:Math.min(max,hp),init,ac,weapon,attacks,status:[]
+  });
+ }
+
+ $('name').value='';$('fromLib').value='';
+ $('ecount').value=1;$('saveLib').checked=false;
+ $('ac').value=10;$('weapon').value='';$('attacks').value='';
+ turn=0;tab('battle');render();
+ say(count>1?name+' ×'+count+' добавлены.':name+' добавлен.');
+};
+
+$('quickAdd').onclick=()=>tab('add');
+
+$('nextTurn').onclick=()=>{
+ if(!people.length){say('Сначала добавь участников.');return}
+ turn++;
+ if(turn>=people.length){
+  turn=0;round++;
+  people.forEach(p=>{
+   p.status.forEach(s=>{
+    if(s.remaining!==null)s.remaining--;
+   });
+   p.status=p.status.filter(s=>
+    s.remaining===null||s.remaining>0);
+  });
+  say('Раунд '+round+': длительность состояний уменьшена.');
+ }else say('Следующий ход.');
+ render();
+};
+
+$('reset').onclick=()=>{
+ if(!people.length)return;
+ people.forEach(p=>{p.hp=p.max;p.status=[]});
+ round=1;turn=0;render();
+ say('Бой сброшен: HP восстановлены, состояния сняты.');
+};
+
+$('fighters').onclick=e=>{
+ const b=e.target.closest('button');
+ if(!b)return;
+ const p=people.find(x=>x.id===Number(b.dataset.id));
+ if(!p)return;
+
+ if(b.classList.contains('hp')){
+  p.hp=Math.max(0,Math.min(p.max,p.hp+Number(b.dataset.n)));
+  say('HP обновлены.');
+ }
+
+ if(b.classList.contains('hit')){
+  const inp=document.querySelector('.damage[data-id="'+p.id+'"]');
+  const n=Number(inp.value);
+  if(inp.value.trim()===''||!Number.isFinite(n)||n<0){
+   say('Введи корректный урон.');return;
+  }
+  p.hp=Math.max(0,p.hp-n);
+  say('Нанесено '+n+' урона.');
+ }
+
+ if(b.classList.contains('remove')){
+  people=people.filter(x=>x.id!==p.id);
+  turn=0;say('Участник удалён.');
+ }
+
+ if(b.classList.contains('addStatus')){
+  const choice=document.querySelector('.statusChoice[data-id="'+p.id+'"]');
+  const duration=document.querySelector('.duration[data-id="'+p.id+'"]');
+  const name=choice.value;
+
+  if(!name){say('Выбери состояние.');return}
+  if(p.status.some(s=>s.name===name)){
+   say('Это состояние уже есть.');return;
+  }
+
+  const raw=duration.value;
+  const remaining=raw===''?null:Math.max(1,Number(raw));
+  p.status.push({name,remaining});
+  say('Состояние «'+name+'» добавлено.');
+ }
+
+ if(b.classList.contains('removeStatus')){
+  const s=p.status.splice(Number(b.dataset.j),1)[0];
+  say('Состояние «'+s.name+'» снято.');
+ }
+
+ render();
+};
+
+const kindIco=k=>k==='enemy'?'👹':k==='player'?'🛡️':'✨';
+const kindName={player:'Герои',ally:'Союзники',enemy:'Враги'};
+const groups=['player','ally','enemy'];
+
+function renderLib(){
+ const sel=$('fromLib'),cur=sel.value;
+ sel.innerHTML='<option value="">— вручную —</option>'+groups.map(k=>{
+  const items=library.filter(x=>x.kind===k);
+  return items.length?'<optgroup label="'+kindName[k]+'">'+
+   items.map(x=>'<option value="'+x.id+'">'+esc(x.name)+' · '+x.max+' HP</option>').join('')+
+   '</optgroup>':'';
+ }).join('');
+ sel.value=cur;
+
+ $('libList').innerHTML=library.length?groups.map(k=>{
+  const items=library.filter(x=>x.kind===k);
+  if(!items.length)return '';
+  return `<div class="small muted" style="margin-top:14px">
+   <b>${kindIco(k)} ${kindName[k].toUpperCase()} (${items.length})</b></div>`+
+  items.map(x=>`
+   <div class="panel between">
+    <div>
+     <strong>${esc(x.name)}</strong>
+     <div class="small muted">${x.ac!=null?'КД '+x.ac+' · ':''}${x.max} HP · инициатива ${(x.bonus||0)>=0?'+':''}${x.bonus||0}</div>
+     ${x.weapon?'<div class="small"><span class="muted">Оружие:</span> '+esc(x.weapon)+'</div>':''}
+     ${atkLines(x.attacks).map(l=>'<div class="small">• '+esc(l)+'</div>').join('')}
+    </div>
+    <div class="row">
+     <button class="btn primary" data-act="use" data-id="${x.id}">⚔️ В бой</button>
+     <button class="btn" data-act="del" data-id="${x.id}">✕</button>
+    </div>
+   </div>`).join('');
+ }).join(''):'<div class="panel empty">Справочник пуст. Добавь героев и врагов выше.</div>';
+}
+
+function rollInit(){
+ const b=Number($('initBonus').value)||0;
+ const r=Math.floor(Math.random()*20)+1;
+ $('initiative').value=r+b;
+ say('d20: '+r+(b?(b>0?' + ':' − ')+Math.abs(b):'')+' = '+(r+b));
+}
+
+function applyLib(){
+ const it=library.find(x=>x.id===Number($('fromLib').value));
+ if(!it)return;
+ $('name').value=it.name;
+ $('kind').value=it.kind;
+ $('maxhp').value=it.max;
+ $('hp').value=it.max;
+ $('initBonus').value=it.bonus||0;
+ $('ac').value=it.ac!=null?it.ac:'';
+ $('weapon').value=it.weapon||'';
+ $('attacks').value=it.attacks||'';
+ rollInit();
+}
+
+$('fromLib').onchange=applyLib;
+$('rollInit').onclick=rollInit;
+
+$('libAdd').onclick=()=>{
+ const name=$('lname').value.trim();
+ const max=Number($('lmax').value);
+ const bonus=Number($('lbonus').value)||0;
+ const ac=$('lac').value.trim()===''?null:Math.max(0,Number($('lac').value)||0);
+ const weapon=$('lweapon').value.trim();
+ const attacks=$('lattacks').value.trim();
+ const kind=$('lkind').value;
+ if(!name||!Number.isFinite(max)||max<1){say('Проверь введённые данные.');return}
+ if(library.some(x=>x.kind===kind&&x.name.toLowerCase()===name.toLowerCase())){
+  say('Такая запись уже есть в справочнике.');return;
+ }
+ library.push({id:libId++,name,kind,max,bonus,ac,weapon,attacks});
+ $('lname').value='';$('lac').value=10;$('lweapon').value='';$('lattacks').value='';
+ render();say('«'+name+'» добавлен в справочник.');
+};
+
+$('libList').onclick=e=>{
+ const b=e.target.closest('button');
+ if(!b)return;
+ const id=Number(b.dataset.id);
+ if(b.dataset.act==='use'){
+  $('fromLib').value=String(id);
+  tab('add');applyLib();
+ }
+ if(b.dataset.act==='del'){
+  library=library.filter(x=>x.id!==id);
+  render();say('Удалено из справочника.');
+ }
+};
+
+const WG=['Простое рукопашное','Простое дальнобойное','Воинское рукопашное','Воинское дальнобойное'];
+// [название, группа, цена, урон, вес, свойства]
+const WEAPONS=[
+['Дубинка',0,'1 см','1d4 дробящий','2 фнт.','лёгкое'],
+['Кинжал',0,'2 зм','1d4 колющий','1 фнт.','фехтовальное, лёгкое, метательное (20/60)'],
+['Палица',0,'2 см','1d8 дробящий','10 фнт.','двуручное'],
+['Ручной топор',0,'5 зм','1d6 рубящий','2 фнт.','лёгкое, метательное (20/60)'],
+['Метательное копьё',0,'5 см','1d6 колющий','2 фнт.','метательное (30/120)'],
+['Лёгкий молот',0,'2 зм','1d4 дробящий','2 фнт.','лёгкое, метательное (20/60)'],
+['Булава',0,'5 зм','1d6 дробящий','4 фнт.',''],
+['Боевой посох',0,'2 см','1d6 дробящий','4 фнт.','универсальное (1d8)'],
+['Серп',0,'1 зм','1d4 рубящий','2 фнт.','лёгкое'],
+['Копьё',0,'1 зм','1d6 колющий','3 фнт.','метательное (20/60), универсальное (1d8)'],
+['Лёгкий арбалет',1,'25 зм','1d8 колющий','5 фнт.','боеприпасы (80/320), перезарядка, двуручное'],
+['Дротик',1,'5 мм','1d4 колющий','1/4 фнт.','фехтовальное, метательное (20/60)'],
+['Короткий лук',1,'25 зм','1d6 колющий','2 фнт.','боеприпасы (80/320), двуручное'],
+['Праща',1,'1 см','1d4 дробящий','—','боеприпасы (30/120)'],
+['Боевой топор',2,'10 зм','1d8 рубящий','4 фнт.','универсальное (1d10)'],
+['Цеп',2,'10 зм','1d8 дробящий','2 фнт.',''],
+['Глефа',2,'20 зм','1d10 рубящий','6 фнт.','тяжёлое, досягаемость, двуручное'],
+['Секира',2,'30 зм','1d12 рубящий','7 фнт.','тяжёлое, двуручное'],
+['Двуручный меч',2,'50 зм','2d6 рубящий','6 фнт.','тяжёлое, двуручное'],
+['Алебарда',2,'20 зм','1d10 рубящий','6 фнт.','тяжёлое, досягаемость, двуручное'],
+['Длинное копьё',2,'10 зм','1d12 колющий','6 фнт.','досягаемость, особое'],
+['Длинный меч',2,'15 зм','1d8 рубящий','3 фнт.','универсальное (1d10)'],
+['Молот',2,'10 зм','2d6 дробящий','10 фнт.','тяжёлое, двуручное'],
+['Моргенштерн',2,'15 зм','1d8 колющий','4 фнт.',''],
+['Пика',2,'5 зм','1d10 колющий','18 фнт.','тяжёлое, досягаемость, двуручное'],
+['Рапира',2,'25 зм','1d8 колющий','2 фнт.','фехтовальное'],
+['Скимитар',2,'25 зм','1d6 рубящий','3 фнт.','фехтовальное, лёгкое'],
+['Короткий меч',2,'10 зм','1d6 колющий','2 фнт.','фехтовальное, лёгкое'],
+['Трезубец',2,'5 зм','1d6 колющий','4 фнт.','метательное (20/60), универсальное (1d8)'],
+['Боевая кирка',2,'5 зм','1d8 колющий','2 фнт.',''],
+['Боевой молот',2,'15 зм','1d8 дробящий','2 фнт.','универсальное (1d10)'],
+['Кнут',2,'2 зм','1d4 рубящий','3 фнт.','фехтовальное, досягаемость'],
+['Духовая трубка',3,'10 зм','1 колющий','1 фнт.','боеприпасы (25/100), перезарядка'],
+['Ручной арбалет',3,'75 зм','1d6 колющий','3 фнт.','боеприпасы (30/120), лёгкое, перезарядка'],
+['Тяжёлый арбалет',3,'50 зм','1d10 колющий','18 фнт.','боеприпасы (100/400), тяжёлое, перезарядка, двуручное'],
+['Длинный лук',3,'50 зм','1d8 колющий','2 фнт.','боеприпасы (150/600), тяжёлое, двуручное'],
+['Сеть',3,'1 зм','—','3 фнт.','особое, метательное (5/15)']
+];
+
+const WPROPS=[
+['Боеприпасы','Для дальней атаки нужны боеприпасы, каждая атака тратит один. Достать боеприпас — часть атаки. После боя можно подобрать половину потраченных. Атака таким оружием в ближнем бою считается импровизированным оружием (1d4).'],
+['Фехтовальное','Для броска атаки и урона можно использовать модификатор Силы или Ловкости (одинаковый для обоих бросков).'],
+['Тяжёлое','Маленькие и меньшие существа совершают атаки этим оружием с помехой.'],
+['Лёгкое','Подходит для боя двумя оружиями: бонусным действием можно атаковать вторым лёгким оружием в другой руке (без модификатора к урону, если он положительный).'],
+['Перезарядка','Независимо от числа атак за действие, бонусное действие или реакцию можно выстрелить только один раз.'],
+['Досягаемость','Увеличивает дистанцию ближней атаки на 5 фт. (до 10 фт.), в том числе для атак по возможности.'],
+['Метательное','Можно метнуть для дальней атаки. Метательное оружие ближнего боя использует тот же модификатор характеристики, что и ближняя атака.'],
+['Двуручное','Для атаки нужны обе руки.'],
+['Универсальное','Можно держать одной или двумя руками. Урон в скобках — при хвате двумя руками.'],
+['Особое: длинное копьё','Атаки по цели в пределах 5 фт. совершаются с помехой. Если вы не верхом, копьё требует двух рук.'],
+['Особое: сеть','Существо Большого размера или меньше, в которое попали, становится опутанным, пока не освободится. На бесформенных и Огромных существ не действует. Освободиться можно действием (проверка Силы Сл 10) или нанеся сети 5 рубящего урона (КД 10). Сеть урона не наносит. При атаке сетью можно совершить только одну атаку, сколько бы атак у вас ни было.']
+];
+
+function renderWeapons(){
+ const q=$('wsearch').value.trim().toLowerCase(),f=$('wfilter').value;
+ const html=WG.map((g,gi)=>{
+  if(f!==''&&Number(f)!==gi)return '';
+  const items=WEAPONS.filter(w=>w[1]===gi&&w[0].toLowerCase().includes(q));
+  if(!items.length)return '';
+  return `<div class="small muted" style="margin-top:14px"><b>${g.toUpperCase()} (${items.length})</b></div>`+
+  items.map(w=>`
+   <div class="panel">
+    <div class="between"><strong>${w[0]}</strong><b>${w[3]}</b></div>
+    <div class="small muted" style="margin-top:4px">${w[2]} · ${w[4]}${w[5]?' · '+w[5]:''}</div>
+   </div>`).join('');
+ }).join('');
+ $('wlist').innerHTML=html||'<div class="panel empty">Ничего не найдено.</div>';
+}
+
+function fillWeaponSelects(){
+ const html='<option value="">Оружие из справочника…</option>'+
+  WG.map((g,gi)=>'<optgroup label="'+g+'">'+
+   WEAPONS.filter(w=>w[1]===gi).map(w=>'<option>'+w[0]+'</option>').join('')+
+  '</optgroup>').join('');
+ $('wpickA').innerHTML=html;
+ $('wpickL').innerHTML=html;
+}
+
+function addWeapon(sfx,wId,aId){
+ const w=WEAPONS.find(x=>x[0]===$('wpick'+sfx).value);
+ if(!w){say('Выбери оружие из справочника.');return}
+ const raw=$('wbonus'+sfx).value.trim();
+ const bn=raw===''?'':(Number(raw)>=0?'+':'')+Number(raw)+' к атаке, ';
+ const line=w[0]+': '+bn+(w[3]==='—'?'урона нет':w[3])+(w[5]?' · '+w[5]:'');
+ const a=$(aId);
+ a.value=a.value.trim()?a.value.trim()+'\n'+line:line;
+ const wf=$(wId);
+ const names=wf.value.split(',').map(x=>x.trim()).filter(Boolean);
+ if(!names.includes(w[0]))names.push(w[0]);
+ wf.value=names.join(', ');
+ say('Атака «'+w[0]+'» добавлена.');
+}
+
+$('wsearch').oninput=renderWeapons;
+$('wfilter').onchange=renderWeapons;
+$('wbtnA').onclick=()=>addWeapon('A','weapon','attacks');
+$('wbtnL').onclick=()=>addWeapon('L','lweapon','lattacks');
+$('wprops').innerHTML=WPROPS.map(d=>`
+ <details>
+  <summary>${d[0]}</summary>
+  <div class="hint" style="margin-top:7px">${d[1]}</div>
+ </details>`).join('');
+fillWeaponSelects();
+renderWeapons();
+
+window.WEAPONS=WEAPONS;window.WG=WG;
+window.addToCombat=o=>{
+ people.push({id:nextId++,name:o.name,kind:o.kind||'player',max:o.max,
+  hp:Math.min(o.max,o.hp),init:o.init,ac:o.ac,weapon:o.weapon||'',
+  attacks:o.attacks||'',status:[]});
+ turn=0;render();say(o.name+' добавлен в бой.');
+};
+
+$('glossary').innerHTML=defs.map(d=>`
+ <details>
+  <summary>${d[1]} ${d[0]}</summary>
+  <div class="hint" style="margin-top:7px">${d[2]}</div>
+ </details>`).join('');
+
+quiet=true;render();quiet=false;
+load();
+})();
+</script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const toast=s=>window.toast(s);
+const sg=n=>(n>=0?'+':'')+n;
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tg=window.Telegram&&Telegram.WebApp;
+const ask=(m,cb)=>{
+ if(tg&&tg.showConfirm&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.2'))tg.showConfirm(m,ok=>{if(ok)cb()});
+ else if(confirm(m))cb();
+};
+
+const AB=[['str','СИЛ','Сила'],['dex','ЛОВ','Ловкость'],['con','ТЕЛ','Телосложение'],
+ ['int','ИНТ','Интеллект'],['wis','МДР','Мудрость'],['cha','ХАР','Харизма']];
+const SK=[['acrobatics','Акробатика','dex'],['investigation','Анализ','int'],['athletics','Атлетика','str'],
+ ['perception','Внимательность','wis'],['survival','Выживание','wis'],['performance','Выступление','cha'],
+ ['intimidation','Запугивание','cha'],['history','История','int'],['sleight','Ловкость рук','dex'],
+ ['arcana','Магия','int'],['medicine','Медицина','wis'],['deception','Обман','cha'],
+ ['nature','Природа','int'],['insight','Проницательность','wis'],['religion','Религия','int'],
+ ['stealth','Скрытность','dex'],['persuasion','Убеждение','cha'],['animal','Уход за животными','wis']];
+
+const newChar=()=>({
+ id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+ name:'Новый персонаж',cls:'',level:1,race:'',bg:'',align:'',player:'',xp:0,insp:false,
+ abil:{str:10,dex:10,con:10,int:10,wis:10,cha:10},saveProf:{},skillProf:{},
+ ac:10,speed:30,initBonus:0,hpMax:10,hp:10,hpTemp:0,hitDice:'',
+ ds:[false,false,false,false,false,false],attacks:[],
+ cp:0,sp:0,ep:0,gp:0,pp:0,equip:'',traits:'',ideals:'',bonds:'',flaws:'',
+ features:'',profs:'',notes:'',spellAbil:'int',slots:{},spells:{}
+});
+
+let chars=[],curId=null;
+const cur=()=>chars.find(c=>c.id===curId);
+const persist=()=>Store.save('chars',{chars,curId});
+const getP=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+const setP=(o,p,v)=>{
+ const ks=p.split('.'),l=ks.pop();
+ const t=ks.reduce((a,k)=>(a[k]==null?(a[k]={}):a[k]),o);
+ t[l]=v;
+};
+
+function S(c){
+ const lvl=Math.min(20,Math.max(1,Number(c.level)||1));
+ return {pb:2+Math.floor((lvl-1)/4),
+  mod:k=>Math.floor(((Number(c.abil&&c.abil[k])||10)-10)/2)};
+}
+
+/* ---------- разметка ---------- */
+const inp=(l,k,a='')=>`<label>${l}<input data-k="${k}" ${a}></label>`;
+const num=(l,k,a='')=>inp(l,k,'type="number" '+a);
+const area=(l,k,r=3)=>`<label style="margin-top:8px">${l}<textarea data-k="${k}" style="min-height:${r*22}px"></textarea></label>`;
+const sec=(t,b,o=true)=>`<details class="sec" ${o?'open':''}><summary>${t}</summary><div style="margin-top:10px">${b}</div></details>`;
+const calcBox=(l,id)=>`<label>${l}<div class="mod" data-c="${id}" style="padding:6px 0"></div></label>`;
+
+function sheetHTML(){
+ const lv=Array.from({length:9},(_,i)=>i+1);
+ return [
+ sec('📋 Основное',`
+  ${inp('Имя персонажа','name')}
+  <div class="grid" style="margin-top:8px">
+   ${inp('Класс','cls')}${num('Уровень','level','min="1" max="20"')}
+   ${inp('Раса','race')}${inp('Предыстория','bg')}
+   ${inp('Мировоззрение','align')}${inp('Игрок','player')}
+   ${num('Опыт (XP)','xp','min="0"')}${calcBox('Бонус мастерства','pb')}
+  </div>
+  <label class="check"><input type="checkbox" data-k="insp"> ✨ Вдохновение</label>`),
+
+ sec('💪 Характеристики',`<div class="abgrid">${AB.map(([k,ab,n])=>`
+  <div class="abbox"><div class="small muted">${n}</div>
+   <div class="mod" data-c="mod.${k}"></div>
+   <input data-k="abil.${k}" type="number" min="1" max="30"></div>`).join('')}</div>`),
+
+ sec('🛡️ Спасброски и навыки',`
+  <div class="small muted"><b>СПАСБРОСКИ</b> (отметь владение)</div>
+  ${AB.map(([k,ab,n])=>`<div class="line"><input type="checkbox" data-k="saveProf.${k}"><span style="flex:1">${n}</span><span class="v" data-c="save.${k}"></span></div>`).join('')}
+  <div class="small muted" style="margin-top:14px"><b>НАВЫКИ</b> (○ нет · ● владение · ◆ компетентность)</div>
+  ${SK.map(([k,n,a])=>`<div class="line"><button class="sk" data-skill="${k}">○</button><span style="flex:1">${n} <span class="small muted">(${AB.find(x=>x[0]===a)[1]})</span></span><span class="v" data-c="skill.${k}"></span></div>`).join('')}
+  <div class="line"><span style="flex:1">👁️ Пассивная внимательность</span><span class="v" data-c="passive"></span></div>`),
+
+ sec('❤️ Бой',`
+  <div class="grid">
+   ${num('Класс доспеха (КД)','ac','min="0"')}${num('Скорость (фт.)','speed','min="0"')}
+   ${num('Бонус к инициативе','initBonus')}${calcBox('Инициатива','init')}
+   ${num('Максимум HP','hpMax','min="0"')}${num('Текущие HP','hp','min="0"')}
+   ${num('Временные HP','hpTemp','min="0"')}${inp('Кости хитов','hitDice','placeholder="3d8"')}
+  </div>
+  <div class="row" style="margin-top:9px">${[-5,-1,1,5].map(n=>`<button class="btn" data-hp="${n}">${n>0?'+':''}${n} HP</button>`).join('')}</div>
+  <div class="small muted" style="margin-top:12px"><b>СПАСБРОСКИ ОТ СМЕРТИ</b></div>
+  <div class="row" style="margin-top:6px">Успехи ${[0,1,2].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}
+   &nbsp;&nbsp;Провалы ${[3,4,5].map(i=>`<input type="checkbox" data-k="ds.${i}">`).join('')}</div>
+  <button class="btn full" id="longRest" style="margin-top:10px">🌙 Долгий отдых</button>`),
+
+ sec('⚔️ Атаки',`
+  <div id="atkList"></div>
+  <button class="btn full" id="atkAdd" style="margin-top:4px">＋ Добавить атаку вручную</button>
+  <div class="wpicker2">
+   <select id="sheetWpick"></select>
+   <label class="check"><input type="checkbox" id="wProf" checked> Владею</label>
+   <button class="btn" id="wAdd">＋</button>
+  </div>
+  <div class="hint" style="margin-top:6px">Бонус атаки и урон считаются сами: Сила для рукопашного, Ловкость для дальнобойного, лучшая из двух для фехтовального оружия.</div>`),
+
+ sec('🎒 Снаряжение и деньги',`
+  <div class="grid" style="grid-template-columns:repeat(5,1fr)">${[['cp','ММ'],['sp','СМ'],['ep','ЭМ'],['gp','ЗМ'],['pp','ПМ']].map(([k,l])=>`<label>${l}<input data-k="${k}" type="number" min="0" style="padding:8px 4px;text-align:center"></label>`).join('')}</div>
+  ${area('Снаряжение','equip',5)}`),
+
+ sec('🎭 Личность',area('Черты характера','traits')+area('Идеалы','ideals')+area('Привязанности','bonds')+area('Слабости','flaws'),false),
+
+ sec('📜 Умения и владения',area('Умения и особенности','features',5)+area('Владения и языки','profs',4)+area('Заметки','notes',4),false),
+
+ sec('🔮 Заклинания',`
+  <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+   <label>Характеристика<select data-k="spellAbil">${AB.filter(a=>['int','wis','cha'].includes(a[0])).map(a=>`<option value="${a[0]}">${a[2]}</option>`).join('')}</select></label>
+   ${calcBox('Сл спасброска','dc')}${calcBox('Бонус атаки','sattack')}
+  </div>
+  <div class="small muted" style="margin-top:12px"><b>ЯЧЕЙКИ</b> (всего / потрачено)</div>
+  <div class="abgrid" style="margin-top:6px">${lv.map(i=>`
+   <div class="abbox"><div class="small muted">${i} ур.</div>
+    <div class="row" style="flex-wrap:nowrap;gap:3px;margin-top:4px">
+     <input data-k="slots.${i}.t" type="number" min="0" style="padding:6px 2px;text-align:center;margin:0">
+     <span>/</span>
+     <input data-k="slots.${i}.u" type="number" min="0" style="padding:6px 2px;text-align:center;margin:0">
+    </div></div>`).join('')}</div>
+  ${[0,...lv].map(i=>area(i===0?'Заговоры':i+' уровень','spells.'+i,3)).join('')}`,false)
+ ].join('');
+}
+
+/* ---------- расчёты ---------- */
+function calc(){
+ const c=cur();if(!c)return;
+ const {pb,mod}=S(c);
+ const set=(id,v)=>{const e=document.querySelector('[data-c="'+id+'"]');if(e)e.textContent=v};
+ set('pb',sg(pb));
+ AB.forEach(([k])=>{
+  set('mod.'+k,sg(mod(k)));
+  set('save.'+k,sg(mod(k)+(c.saveProf&&c.saveProf[k]?pb:0)));
+ });
+ SK.forEach(([k,n,a])=>{
+  const p=(c.skillProf&&c.skillProf[k])||0;
+  set('skill.'+k,sg(mod(a)+p*pb));
+  const b=document.querySelector('.sk[data-skill="'+k+'"]');
+  if(b)b.textContent=['○','●','◆'][p];
+ });
+ set('init',sg(mod('dex')+(Number(c.initBonus)||0)));
+ set('passive',10+mod('wis')+((c.skillProf&&c.skillProf.perception)||0)*pb);
+ const sa=c.spellAbil||'int';
+ set('dc',8+pb+mod(sa));
+ set('sattack',sg(pb+mod(sa)));
+}
+
+function fill(){
+ const c=cur();
+ document.querySelectorAll('#sheetBody [data-k]').forEach(el=>{
+  const k=el.dataset.k,v=getP(c,k);
+  if(el.type==='checkbox')el.checked=!!v;
+  else el.value=v==null?(k.startsWith('abil.')?10:''):v;
+ });
+}
+
+function renderAtk(){
+ const c=cur();
+ $('atkList').innerHTML=c.attacks.length?c.attacks.map((a,i)=>`
+  <div class="atkrow">
+   <div class="row" style="flex-wrap:nowrap">
+    <input data-ai="${i}" data-af="name" placeholder="Название" value="${esc(a.name)}">
+    <input data-ai="${i}" data-af="bonus" placeholder="Бонус" value="${esc(a.bonus)}" style="width:72px;flex:none">
+    <button class="btn" data-adel="${i}">✕</button>
+   </div>
+   <div class="row" style="flex-wrap:nowrap;margin-top:6px">
+    <input data-ai="${i}" data-af="dmg" placeholder="Урон" value="${esc(a.dmg)}">
+    <input data-ai="${i}" data-af="note" placeholder="Свойства" value="${esc(a.note)}">
+   </div>
+  </div>`).join(''):'<div class="small muted" style="margin-bottom:8px">Атак пока нет.</div>';
+}
+
+function renderSel(){
+ $('charSel').innerHTML=chars.map(c=>`<option value="${c.id}"${c.id===curId?' selected':''}>${esc(c.name||'Без имени')}</option>`).join('');
+}
+
+function show(){fill();calc();renderAtk();renderSel();}
+
+function ensure(){
+ if(!chars.length){const c=newChar();chars=[c];curId=c.id;}
+ if(!cur())curId=chars[0].id;
+}
+
+/* ---------- события ---------- */
+function onField(e){
+ const el=e.target,c=cur();
+ if(!c)return;
+ if(el.dataset.k){
+  let v;
+  if(el.type==='checkbox')v=el.checked;
+  else if(el.type==='number')v=el.value===''?'':Number(el.value);
+  else v=el.value;
+  setP(c,el.dataset.k,v);
+  if(el.dataset.k==='name')renderSel();
+  calc();persist();
+ }else if(el.dataset.ai!==undefined){
+  c.attacks[Number(el.dataset.ai)][el.dataset.af]=el.value;
+  persist();
+ }
+}
+
+function onClick(e){
+ const b=e.target.closest('button');
+ if(!b)return;
+ const c=cur();
+ if(b.dataset.skill){
+  c.skillProf=c.skillProf||{};
+  c.skillProf[b.dataset.skill]=((c.skillProf[b.dataset.skill]||0)+1)%3;
+  calc();persist();
+ }
+ if(b.dataset.hp){
+  const max=Number(c.hpMax)||0;
+  c.hp=Math.max(0,Math.min(max,(Number(c.hp)||0)+Number(b.dataset.hp)));
+  document.querySelector('[data-k="hp"]').value=c.hp;
+  persist();
+ }
+ if(b.dataset.adel!==undefined){
+  c.attacks.splice(Number(b.dataset.adel),1);
+  renderAtk();persist();
+ }
+ if(b.id==='atkAdd'){
+  c.attacks.push({name:'',bonus:'',dmg:'',note:''});
+  renderAtk();persist();
+ }
+ if(b.id==='wAdd')addWeapon();
+ if(b.id==='longRest'){
+  c.hp=Number(c.hpMax)||0;c.hpTemp=0;
+  c.ds=[false,false,false,false,false,false];
+  Object.values(c.slots||{}).forEach(s=>{s.u=0});
+  fill();calc();persist();
+  toast('Долгий отдых: HP и ячейки заклинаний восстановлены.');
+ }
+}
+
+function addWeapon(){
+ const c=cur();
+ const w=window.WEAPONS.find(x=>x[0]===$('sheetWpick').value);
+ if(!w){toast('Выбери оружие из списка.');return}
+ const {pb,mod}=S(c);
+ const ranged=w[1]===1||w[1]===3;
+ const finesse=w[5].includes('фехтовальное');
+ const m=ranged?mod('dex'):finesse?Math.max(mod('str'),mod('dex')):mod('str');
+ const prof=$('wProf').checked;
+ const parts=w[3].split(' ');
+ const dice=parts.shift();
+ const dmg=w[3]==='—'?'—':dice+(m?sg(m):'')+' '+parts.join(' ');
+ c.attacks.push({name:w[0],bonus:sg(m+(prof?pb:0)),dmg,note:w[5]});
+ renderAtk();persist();
+ toast('Атака «'+w[0]+'» добавлена.');
+}
+
+function setMode(m){
+ $('combatApp').classList.toggle('hidden',m!=='combat');
+ $('sheetApp').classList.toggle('hidden',m!=='sheet');
+ document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
+ try{localStorage.setItem('dnd.mode',m)}catch(e){}
+ window.scrollTo(0,0);
+}
+
+function init(){
+ $('sheetBody').innerHTML=sheetHTML();
+ $('sheetWpick').innerHTML='<option value="">Оружие из справочника…</option>'+
+  window.WG.map((g,gi)=>'<optgroup label="'+g+'">'+
+   window.WEAPONS.filter(w=>w[1]===gi).map(w=>'<option>'+w[0]+'</option>').join('')+'</optgroup>').join('');
+
+ ['input','change'].forEach(ev=>$('sheetBody').addEventListener(ev,onField));
+ $('sheetBody').addEventListener('click',onClick);
+
+ $('charSel').onchange=()=>{curId=$('charSel').value;persist();show();};
+ $('charNew').onclick=()=>{const c=newChar();chars.push(c);curId=c.id;persist();show();toast('Персонаж создан.');};
+ $('charCopy').onclick=()=>{
+  const c=JSON.parse(JSON.stringify(cur()));
+  c.id=newChar().id;c.name=(c.name||'Персонаж')+' (копия)';
+  chars.push(c);curId=c.id;persist();show();toast('Копия создана.');
+ };
+ $('charDel').onclick=()=>ask('Удалить персонажа «'+(cur().name||'Без имени')+'»?',()=>{
+  chars=chars.filter(c=>c.id!==curId);
+  ensure();persist();show();toast('Персонаж удалён.');
+ });
+ $('toCombat').onclick=()=>{
+  const c=cur(),{mod}=S(c);
+  const init=Math.floor(Math.random()*20)+1+mod('dex')+(Number(c.initBonus)||0);
+  const lines=c.attacks.filter(a=>a.name).map(a=>{
+   const b=String(a.bonus||'').trim();
+   return a.name+': '+(b?(/^[+-]/.test(b)?b:'+'+b)+' к атаке, ':'')+(a.dmg||'')+(a.note?' · '+a.note:'');
+  }).join('\n');
+  window.addToCombat({name:c.name||'Персонаж',kind:'player',
+   max:Math.max(1,Number(c.hpMax)||1),hp:Number(c.hp)||0,init,ac:Number(c.ac)||0,
+   weapon:c.attacks.map(a=>a.name).filter(Boolean).join(', '),attacks:lines});
+  setMode('combat');
+ };
+ document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+
+ Store.load('chars',x=>{
+  if(x&&Array.isArray(x.chars)&&x.chars.length){
+   chars=x.chars.map(c=>Object.assign(newChar(),c,{abil:Object.assign(newChar().abil,c.abil)}));
+   curId=x.curId;
+  }
+  ensure();show();
+ });
+ ensure();show();
+ let m='combat';
+ try{m=localStorage.getItem('dnd.mode')||'combat'}catch(e){}
+ setMode(m==='sheet'?'sheet':'combat');
+}
+init();
+})();
+</script>
+</body>
+</html>
